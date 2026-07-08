@@ -95,7 +95,7 @@
                 <td><?= e($row['departamento'] ?? '') ?></td>
                 <td>B/. <?= e(number_format((float) $row['salario'], 2)) ?></td>
                 <td><?= e($row['fecha_inicio']) ?></td>
-                <td><?= e($row['fecha_fin'] ?? 'Actual') ?></td>
+                <td><?= e($row['fecha_fin'] ?? 'N/A') ?></td>
                 <td><?= (int) $row['cargo_activo'] === 1 ? 'Si' : 'No' ?></td>
                 <td><?= (int) $row['empleado_activo'] === 1 ? 'Si' : 'No' ?></td>
                 <td><?= e($row['motivo_baja'] ?? 'No aplica') ?></td>

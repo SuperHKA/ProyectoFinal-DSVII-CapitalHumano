@@ -10,6 +10,7 @@ namespace App\Utilidades;
 final class Validator
 {
     private const SEXOS = ['Masculino', 'Femenino', 'Otro'];
+    private const EDAD_MINIMA = 16;
 
     /**
      * @param array<string,mixed> $data
@@ -30,8 +31,18 @@ final class Validator
         if ($data['primer_apellido'] !== '' && !preg_match('/^[\p{L}\s\'-]{2,80}$/u', (string) $data['primer_apellido'])) {
             $errors[] = 'El primer apellido solo debe contener letras y espacios.';
         }
-        if ((string) ($data['fecha_nacimiento'] ?? '') !== '' && !self::validDate((string) $data['fecha_nacimiento'])) {
-            $errors[] = 'La fecha de nacimiento no es valida.';
+        if ((string) ($data['fecha_nacimiento'] ?? '') !== '') {
+            if (!self::validDate((string) $data['fecha_nacimiento'])) {
+                $errors[] = 'La fecha de nacimiento no es valida.';
+            } else {
+                $fechaNac = new \DateTimeImmutable($data['fecha_nacimiento']);
+                $hoy = new \DateTimeImmutable('today');
+                if ($fechaNac > $hoy) {
+                    $errors[] = 'La fecha de nacimiento no puede ser futura.';
+                } elseif ($fechaNac->diff($hoy)->y < self::EDAD_MINIMA) {
+                    $errors[] = 'El colaborador debe tener al menos ' . self::EDAD_MINIMA . ' años.';
+                }
+            }
         }
         if (!in_array($data['sexo'], self::SEXOS, true)) {
             $errors[] = 'Seleccione un sexo valido.';
@@ -80,6 +91,13 @@ final class Validator
         }
         if (!self::validDate((string) $data['fecha_inicio'])) {
             $errors[] = 'La fecha de inicio debe tener formato valido.';
+        } else {
+            $fechaInicio = new \DateTimeImmutable($data['fecha_inicio']);
+            $hoy = new \DateTimeImmutable('today');
+            $maxFuturo = $hoy->modify('+90 days');
+            if ($fechaInicio > $maxFuturo) {
+                $errors[] = 'La fecha de inicio no puede ser superior a 90 dias en el futuro.';
+            }
         }
         if ((string) ($data['fecha_fin'] ?? '') !== '') {
             if (!self::validDate((string) $data['fecha_fin'])) {
@@ -103,6 +121,12 @@ final class Validator
         self::required($data, ['fecha_fin', 'motivo_terminacion_id'], $errors);
         if (!self::validDate((string) $data['fecha_fin'])) {
             $errors[] = 'La fecha fin debe tener formato valido.';
+        } else {
+            $fechaFin = new \DateTimeImmutable($data['fecha_fin']);
+            $hoy = new \DateTimeImmutable('today');
+            if ($fechaFin > $hoy) {
+                $errors[] = 'La fecha de baja no puede ser futura.';
+            }
         }
         if (!self::idExists((int) $data['motivo_terminacion_id'], $catalogos['motivos_terminacion'] ?? [])) {
             $errors[] = 'Seleccione un motivo de baja valido.';
@@ -134,7 +158,7 @@ final class Validator
             $errors[] = 'El usuario debe tener de 4 a 50 caracteres alfanumericos o guion bajo.';
         }
         if (!empty($data['password']) && !self::validPassword((string) $data['password'])) {
-            $errors[] = 'La contraseña debe tener entre 8 y 12 caracteres.';
+            $errors[] = 'La contraseÃ±a debe tener entre 8 y 12 caracteres.';
         }
         if (empty($data['roles']) || !is_array($data['roles'])) {
             $errors[] = 'Seleccione al menos un rol.';
@@ -220,3 +244,7 @@ final class Validator
         return $length >= 8 && $length <= 12;
     }
 }
+
+
+
+

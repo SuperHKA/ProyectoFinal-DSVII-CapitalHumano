@@ -124,7 +124,7 @@
                 <td><?= e($perfil['departamento'] ?? 'No asignado') ?></td>
                 <td>B/. <?= e(number_format((float) $perfil['salario'], 2)) ?></td>
                 <td><?= e($perfil['fecha_inicio']) ?></td>
-                <td><?= e($perfil['fecha_fin'] ?? 'Actual') ?></td>
+                <td><?= e($perfil['fecha_fin'] ?? 'N/A') ?></td>
                 <td><?= (int) $perfil['cargo_activo'] === 1 ? 'Si' : 'No' ?></td>
                 <td><?= (int) $perfil['empleado_activo'] === 1 ? 'Si' : 'No' ?></td>
                 <td><?= e($perfil['motivo_baja'] ?? 'No aplica') ?></td>

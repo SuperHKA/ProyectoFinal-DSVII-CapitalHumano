@@ -64,7 +64,7 @@ final class ExcelExportService
                 $row['departamento'] ?? '',
                 (float) $row['salario'],
                 $row['fecha_inicio'],
-                $row['fecha_fin'] ?? 'Actual',
+                $row['fecha_fin'] ?? 'N/A',
                 (int) $row['cargo_activo'] === 1 ? 'Si' : 'No',
                 (int) $row['empleado_activo'] === 1 ? 'Si' : 'No',
                 $row['motivo_baja'] ?? 'No aplica',
