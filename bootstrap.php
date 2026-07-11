@@ -7,6 +7,15 @@ use App\Utilidades\Sanitizer;
 define('ROOT_PATH', __DIR__);
 define('PUBLIC_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'publico');
 
+// OWASP: cabeceras de seguridad basicas. No aplicar si la peticion ya las emitio
+// (tests, CLI o integraciones que inyectan headers por su cuenta).
+if (PHP_SAPI !== 'cli' && !headers_sent()) {
+    header('X-Frame-Options: DENY');
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: same-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+}
+
 require_once ROOT_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 $envFile = ROOT_PATH . DIRECTORY_SEPARATOR . '.env';
@@ -68,12 +77,59 @@ function e(mixed $value): string
 }
 
 /**
- * Genera una URL relativa hacia el front controller.
+ * Genera una URL absoluta hacia el front controller. Usar siempre
+ * rutas con esta funcion; nunca concatenar 'index.php' a mano.
  */
 function url(string $route, array $params = []): string
 {
     $params = array_merge(['route' => $route], $params);
-    return 'index.php?' . http_build_query($params);
+    $base = base_path();
+    $prefix = $base === '' ? '' : '/' . $base;
+    return $prefix . '/index.php?' . http_build_query($params);
+}
+
+/**
+ * Devuelve el subdirectorio donde esta el front controller (sin /index.php).
+ * Se calcula desde SCRIPT_NAME (la fuente de verdad en runtime) en vez de
+ * parsear APP_URL, para evitar duplicaciones de "publico/" cuando el
+ * servidor expone el sitio en una subcarpeta.
+ */
+function base_path(): string
+{
+    $script = $_SERVER['SCRIPT_NAME'] ?? '';
+    if ($script === '') {
+        return '';
+    }
+    $dir = trim(str_replace('\\', '/', dirname($script)), '/');
+    return $dir;
+}
+
+/**
+ * Lee una clave de configuracion.
+ */
+function config(string $key, mixed $default = null): mixed
+{
+    static $cache = null;
+    if ($cache === null) {
+        $cacheFile = ROOT_PATH . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'app.php';
+        $cache = is_file($cacheFile) ? require $cacheFile : [];
+    }
+    return $cache[$key] ?? $default;
+}
+
+/**
+ * Genera la URL a un asset estatico. Devuelve siempre una URL absoluta
+ * (con "/" al inicio) para que funcione independientemente de la
+ * ubicacion actual del navegador.
+ */
+function asset(string $path): string
+{
+    $base = base_path();
+    $p = ltrim($path, '/');
+    if ($base === '') {
+        return '/' . $p;
+    }
+    return '/' . $base . '/' . $p;
 }
 
 /**

@@ -25,25 +25,10 @@ DROP TABLE IF EXISTS cat_tipos_planilla;
 DROP TABLE IF EXISTS cat_tipoempleado;
 DROP TABLE IF EXISTS cat_ocupaciones;
 DROP TABLE IF EXISTS cat_motivos_terminacion;
-DROP TABLE IF EXISTS cat_estadocivil;
 
 -- ============================================================
 -- Catalogos
 -- ============================================================
-
-CREATE TABLE cat_estadocivil (
-    id INT NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(255) NOT NULL DEFAULT '',
-    PRIMARY KEY (id)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
-
-INSERT INTO cat_estadocivil (id, nombre) VALUES
-(1, 'Seleccionar'),
-(2, 'Soltero (a)'),
-(3, 'Casado (a)'),
-(4, 'Divorciado (a)'),
-(5, 'Viudo (a)'),
-(6, 'Unido (a)');
 
 CREATE TABLE cat_motivos_terminacion (
     C_TERMINACION INT NOT NULL AUTO_INCREMENT,

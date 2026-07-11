@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use Api\Controladores\ApiController;
+use App\Controladores\AdminController;
 use App\Controladores\AuthController;
 use App\Controladores\ColaboradorController;
+use App\Controladores\InicioController;
 use App\Controladores\ReporteController;
 use App\Controladores\RolController;
 use App\Controladores\UsuarioController;
@@ -16,6 +18,7 @@ return [
     'login.process' => [AuthController::class, 'login'],
     'logout' => [AuthController::class, 'logout'],
     'bitacora' => [AuthController::class, 'logs'],
+    'session.heartbeat' => [AuthController::class, 'heartbeat'],
 
     // Usuarios
     'usuarios.index' => [UsuarioController::class, 'index'],
@@ -62,4 +65,8 @@ return [
 
     // API REST
     'api.colaboradores.sexo' => [ApiController::class, 'porSexo'],
+
+    // Inicio (panel general con KPIs y graficos) + Admin (resumen)
+    'inicio'     => [InicioController::class, 'index'],
+    'admin.index' => [AdminController::class, 'index'],
 ];

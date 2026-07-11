@@ -11,11 +11,7 @@
     </div>
 <?php endif; ?>
 
-<form method="post" action="<?= e(url('roles.update', ['id' => $rol['id']])) ?>" class="form-card">
+<form method="post" action="<?= e(url('roles.update', ['id' => $rol['id']])) ?>">
     <?= csrf_field() ?>
-    <?php require __DIR__ . '/_form.php'; ?>
-    <div class="actions">
-        <a href="<?= e(url('roles.index')) ?>" class="btn">Cancelar</a>
-        <button type="submit" class="btn primary">Actualizar</button>
-    </div>
+    <?php $submitLabel = 'Actualizar'; require __DIR__ . '/_form.php'; ?>
 </form>

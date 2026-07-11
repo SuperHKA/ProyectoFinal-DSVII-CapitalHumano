@@ -29,7 +29,7 @@ Tablas incluidas:
 - `departamentos`, `cat_estados_colaborador`
 - `historial_academico`, `solicitudes_vacaciones`
 - `usuarios`, `roles`, `permisos`, `usuario_rol`, `rol_permiso`, `bitacora_accesos`
-- Catalogos: `cat_ocupaciones`, `cat_tipoempleado`, `cat_tipos_planilla`, `cat_motivos_terminacion`, `cat_estadocivil`
+- Catalogos: `cat_ocupaciones`, `cat_tipoempleado`, `cat_tipos_planilla`, `cat_motivos_terminacion`
 
 No incluye tablas del modulo anterior de inscripciones (`inscriptores` e `inscriptor_temas`) ni catalogos no solicitados como paises, tipos de sangre o rutas.
 
@@ -70,27 +70,41 @@ database/capital_humano.sql
 http://localhost/Software7/Proyectos/Software7-ProyectoFinal_Version_2/publico/index.php
 ```
 
-
 ## Credenciales de prueba
 
-| Usuario | Contrasena | Rol            |
-| ------- | ---------- | -------------- |
-| admin   | Admin123!  | Administrador  |
+| Usuario   | Contrasena    | Rol           | Notas |
+| --------- | ------------- | ------------- | ----- |
+| admin     | Admin123!     | Administrador | Acceso total |
+| rrhh      | Rrhh12345!    | RRHH          | Gestion de colaboradores, vacaciones y reportes (sin administracion de usuarios) |
+| consulta  | Consulta123!  | Consulta      | Solo lectura: colaboradores, vacaciones, reportes, bitacora |
+
+> Si los usuarios `rrhh` o `consulta` no existen, ejecutar `database/seed_usuarios_prueba.sql` (incluye los 3 usuarios y asigna los roles definidos en el script unificado).
+
+## Video demo
+
+Enlace al video demostrativo del sistema (capturas de pantalla y recorrido por los modulos principales):
+
+- _(pendiente de subir a YouTube/Google Drive por el estudiante)_
+
+Una vez publicado, reemplazar esta linea por la URL definitiva.
 
 ## Funcionalidades principales
 
 ### Autenticacion y seguridad
+
 - Inicio de sesion con bloqueo automatico despues de 3 intentos fallidos.
 - Bitacora de accesos que registra IP, fecha, intento y anomalias.
 - Tokens CSRF en todos los formularios.
 - Consultas preparadas con PDO para prevenir inyeccion SQL.
 
 ### Administracion de usuarios y roles
+
 - CRUD de usuarios administrativos sin eliminacion fisica.
 - Roles personalizables con permisos por modulo.
 - Un usuario puede tener varios roles.
 
 ### Gestion de colaboradores
+
 - Registro completo: nombres y apellidos separados, fecha de nacimiento, fotografia, direccion, telefono, celular, correo y sexo.
 - Estados del colaborador: Activo, Vacaciones, Licencia, Incapacidad, Baja.
 - Perfil laboral inicial: ocupacion, tipo de empleado, planilla, departamento, salario y fecha de inicio.
@@ -100,6 +114,7 @@ http://localhost/Software7/Proyectos/Software7-ProyectoFinal_Version_2/publico/i
 - Edad calculada automaticamente a partir de la fecha de nacimiento.
 
 ### Reportes y estadisticas
+
 - Reporte visual con indicador de integridad OpenSSL (verde/rojo).
 - Busqueda por documento, nombre, correo, direccion u ocupacion.
 - Filtros por sexo y rango de edad.
@@ -108,11 +123,13 @@ http://localhost/Software7/Proyectos/Software7-ProyectoFinal_Version_2/publico/i
 - Exportacion a Excel `.xlsx` respetando los filtros activos.
 
 ### Vacaciones
+
 - Solicitudes de vacaciones con fechas de salida y retorno.
 - Calculo automatico de dias generados (1 mes por cada 11 meses trabajados).
 - Aprobacion o rechazo de solicitudes.
 
 ### API REST
+
 - Endpoint para la Contraloria General con cantidad de colaboradores por sexo.
 
 ## Integridad OpenSSL
@@ -156,21 +173,21 @@ Software7-ProyectoFinal_Version_2/
 
 ## Clases principales
 
-| Clase | Responsabilidad |
-| --- | --- |
-| `Database` | Conexion PDO singleton |
-| `Catalogo` | Catalogos de ocupaciones, tipos de empleado, planillas, motivos, departamentos y estados |
-| `Colaborador` | CRUD, promociones, bajas, historial, estadisticas y reportes |
-| `Vacacion` | Solicitudes y calculo de dias generados |
-| `HistorialAcademico` | Registros academicos en PDF |
-| `Usuario` | Usuarios, roles y bitacora |
-| `Rol` | Roles y permisos |
-| `AuthService` | Sesion, login, permisos y bloqueos |
-| `IntegrityService` | Firma y verificacion OpenSSL |
-| `ExcelExportService` | Genera archivos Excel |
-| `FileUploadService` | Subida de fotografias y PDFs |
-| `Validator` | Validaciones de entrada |
-| `Sanitizer` | Sanitizacion de datos |
+| Clase                  | Responsabilidad                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| `Database`           | Conexion PDO singleton                                                                   |
+| `Catalogo`           | Catalogos de ocupaciones, tipos de empleado, planillas, motivos, departamentos y estados |
+| `Colaborador`        | CRUD, promociones, bajas, historial, estadisticas y reportes                             |
+| `Vacacion`           | Solicitudes y calculo de dias generados                                                  |
+| `HistorialAcademico` | Registros academicos en PDF                                                              |
+| `Usuario`            | Usuarios, roles y bitacora                                                               |
+| `Rol`                | Roles y permisos                                                                         |
+| `AuthService`        | Sesion, login, permisos y bloqueos                                                       |
+| `IntegrityService`   | Firma y verificacion OpenSSL                                                             |
+| `ExcelExportService` | Genera archivos Excel                                                                    |
+| `FileUploadService`  | Subida de fotografias y PDFs                                                             |
+| `Validator`          | Validaciones de entrada                                                                  |
+| `Sanitizer`          | Sanitizacion de datos                                                                    |
 
 ## API REST
 

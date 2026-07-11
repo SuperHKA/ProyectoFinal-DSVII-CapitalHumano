@@ -1,49 +1,77 @@
-<section class="section-head row-between">
+<section class="page-head">
     <div>
         <h1>Reporte de colaboradores</h1>
         <p>Perfiles laborales e integridad OpenSSL.</p>
     </div>
-    <?php if (\App\Servicios\AuthService::can('reportes', 'exportar')): ?>
-        <a class="btn primary" href="<?= e(url('reportes.export', ['q' => $q, 'sexo' => $sexo, 'edad' => $edad])) ?>">Exportar Excel</a>
-    <?php endif; ?>
+    <div class="page-head__actions">
+        <?php if (\App\Servicios\AuthService::can('reportes', 'exportar')): ?>
+            <a class="btn btn--accent" href="<?= e(url('reportes.export', ['q' => $q, 'sexo' => $sexo, 'edad' => $edad])) ?>">Exportar Excel</a>
+        <?php endif; ?>
+    </div>
 </section>
+
+<div class="grid mb-4" style="grid-template-columns: 1fr 1fr; gap: 16px;">
+    <section class="chart-card">
+        <div class="chart-card__title">Distribucion por sexo</div>
+        <div class="chart-card__canvas">
+            <canvas id="chart-sexo" role="img" aria-label="Grafico de dona con la distribucion por sexo"></canvas>
+        </div>
+    </section>
+    <section class="chart-card">
+        <div class="chart-card__title">Distribucion por edad</div>
+        <div class="chart-card__sub">Rangos 20-25, 25-30, 30-35, mayor de 35</div>
+        <div class="chart-card__canvas">
+            <canvas id="chart-edad" role="img" aria-label="Grafico de barras con la distribucion por rangos de edad"></canvas>
+        </div>
+    </section>
+</div>
 
 <form class="filters" method="get">
     <input type="hidden" name="route" value="reportes.index">
-    <input name="q" placeholder="Buscar por documento, nombre, correo, direccion u ocupacion" value="<?= e($q) ?>">
-    <select name="sexo">
+    <input class="input" name="q" placeholder="Buscar por documento, nombre, correo, direccion u ocupacion" value="<?= e($q) ?>">
+    <select class="select" name="sexo">
         <option value="">Todos los sexos</option>
         <?php foreach (['Masculino', 'Femenino', 'Otro'] as $s): ?>
             <option value="<?= e($s) ?>" <?= selected($sexo, $s) ?>><?= e($s) ?></option>
         <?php endforeach; ?>
     </select>
-    <select name="edad">
+    <select class="select" name="edad">
         <option value="">Todas las edades</option>
-        <?php foreach (['18-25', '26-35', '36-45', '46-55', '56+'] as $r): ?>
+        <?php foreach (['20-25', '25-30', '30-35', 'mayor-35'] as $r): ?>
             <option value="<?= e($r) ?>" <?= selected($edad, $r) ?>><?= e($r) ?></option>
         <?php endforeach; ?>
     </select>
     <button class="btn" type="submit">Buscar</button>
-    <a class="btn ghost" href="<?= e(url('reportes.index')) ?>">Limpiar</a>
+    <a class="btn btn--ghost" href="<?= e(url('reportes.index')) ?>">Limpiar</a>
 </form>
 
-<section class="stats">
-    <h2>Estadisticas</h2>
+<section class="card mb-4">
+    <div class="card--header"><h2>Resumen</h2></div>
     <div class="stats-grid">
         <div class="stat-card">
             <strong>Por sexo</strong>
             <?php foreach ($por_sexo as $s): ?>
-                <div><?= e($s['sexo']) ?>: <?= e($s['total']) ?></div>
+                <div><span><?= e($s['sexo']) ?></span><span class="num"><?= e($s['total']) ?></span></div>
             <?php endforeach; ?>
         </div>
         <div class="stat-card">
             <strong>Por rango de edad</strong>
-            <?php foreach ($por_edad as $e): ?>
-                <div><?= e($e['rango']) ?>: <?= e($e['total']) ?></div>
+            <?php foreach ($por_edad as $r): ?>
+                <div><span><?= e($r['rango']) ?></span><span class="num"><?= e($r['total']) ?></span></div>
             <?php endforeach; ?>
         </div>
     </div>
 </section>
+
+<script>
+window.addEventListener('load', function () {
+    if (!window.charts) return;
+    var c1 = document.getElementById('chart-sexo');
+    var c2 = document.getElementById('chart-edad');
+    if (c1) window.charts.doughnutSexo(c1, <?= json_encode($por_sexo, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>);
+    if (c2) window.charts.barEdad(c2, <?= json_encode($por_edad, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>);
+});
+</script>
 
 <div class="table-wrap report-table">
     <table>

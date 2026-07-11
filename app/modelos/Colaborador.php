@@ -299,11 +299,10 @@ final class Colaborador
 
         if ($rangoEdad !== null && $rangoEdad !== '') {
             $conditions[] = match ($rangoEdad) {
-                '18-25' => 'TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 18 AND 25',
-                '26-35' => 'TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 26 AND 35',
-                '36-45' => 'TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 36 AND 45',
-                '46-55' => 'TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 46 AND 55',
-                '56+' => 'TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) >= 56',
+                '20-25' => 'TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 20 AND 25',
+                '25-30' => 'TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 25 AND 30',
+                '30-35' => 'TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) BETWEEN 30 AND 35',
+                'mayor-35' => 'TIMESTAMPDIFF(YEAR, c.fecha_nacimiento, CURDATE()) > 35',
                 default => '1=1',
             };
         }
@@ -327,11 +326,10 @@ final class Colaborador
     {
         return $this->db->query(
             "SELECT CASE
-                WHEN TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) BETWEEN 18 AND 25 THEN '18-25'
-                WHEN TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) BETWEEN 26 AND 35 THEN '26-35'
-                WHEN TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) BETWEEN 36 AND 45 THEN '36-45'
-                WHEN TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) BETWEEN 46 AND 55 THEN '46-55'
-                ELSE '56+'
+                WHEN TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) BETWEEN 20 AND 25 THEN '20-25'
+                WHEN TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) BETWEEN 25 AND 30 THEN '25-30'
+                WHEN TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) BETWEEN 30 AND 35 THEN '30-35'
+                ELSE 'mayor-35'
             END AS rango, COUNT(*) AS total
             FROM colaboradores
             GROUP BY rango

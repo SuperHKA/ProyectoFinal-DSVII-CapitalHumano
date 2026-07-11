@@ -1,0 +1,39 @@
+/* Dark theme overrides ─────────────────────────────────────────────
+   Activado por [data-theme="dark"] en <html>. Solo sobrescribe los
+   tokens semánticos; los componentes no se duplican.             */
+[data-theme="dark"] {
+  --bg:           oklch(16% 0.008 250);
+  --surface:      oklch(20% 0.008 250);
+  --surface-2:    oklch(23% 0.008 250);
+  --surface-3:    oklch(26% 0.008 250);
+
+  --fg:           oklch(96% 0.005 250);
+  --fg-2:         oklch(82% 0.008 250);
+  --muted:        oklch(64% 0.010 250);
+  --muted-2:      oklch(50% 0.008 250);
+
+  --border:       oklch(38% 0.012 250);
+  --border-2:     oklch(48% 0.014 250);
+  --ring:         oklch(70% 0.18 255 / 0.35);
+
+  --accent:       oklch(70% 0.18 255);
+  --accent-2:     oklch(78% 0.18 255);
+  --accent-soft:  oklch(28% 0.10 255);
+
+  --ok:           oklch(72% 0.18 145);
+  --ok-soft:      oklch(28% 0.10 145);
+  --warn:         oklch(78% 0.18 70);
+  --warn-soft:    oklch(30% 0.12 70);
+  --danger:       oklch(72% 0.20 25);
+  --danger-soft:  oklch(30% 0.12 25);
+  --info:         oklch(72% 0.15 230);
+  --info-soft:    oklch(28% 0.10 230);
+
+  --chart-grid: oklch(28% 0.008 250);
+  --chart-text: oklch(78% 0.010 250);
+
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.30);
+  --shadow-md: 0 4px 12px oklch(0% 0 0 / 0.40);
+  --shadow-lg: 0 20px 48px oklch(0% 0 0 / 0.50);
+  --topbar-background: oklch(16% 0.008 250);
+}

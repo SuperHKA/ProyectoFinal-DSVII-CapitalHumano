@@ -1,8 +1,12 @@
+<?php if (\App\Servicios\AuthService::check()): ?>
+    </main>
+</div>
+<?php else: ?>
 </main>
-<footer class="footer">
+<?php endif; ?>
+<footer class="app-footer">
     <span>&copy; <?= date('Y') ?> Capital Humano</span>
-    <span>contacto@capitalhumano.local</span>
+    <span class="mono">v2.0.0 &middot; PHP <?= PHP_VERSION ?></span>
 </footer>
-<script src="assets/js/app.js"></script>
 </body>
 </html>

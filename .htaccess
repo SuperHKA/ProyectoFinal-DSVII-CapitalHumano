@@ -1,0 +1,20 @@
+# Front controller rewrite (WampServer / Apache 2.4).
+# Permite servir la app desde http://localhost/Software7/.../  (sin /publico/).
+RewriteEngine On
+
+# 1) Reescribir /assets/* al directorio real /publico/assets/*.
+#    Asi los CSS/JS/imagenes se sirven directamente sin pasar por PHP.
+RewriteRule ^assets/(.*)$ publico/assets/$1 [L]
+
+# 2) Lo mismo con /uploads/* (fotografias de colaboradores, PDFs de historial).
+RewriteRule ^uploads/(.*)$ publico/uploads/$1 [L]
+
+# 3) Evitar reescrituras para el propio front controller.
+RewriteCond %{REQUEST_URI} !^/Software7/Proyectos/Software7-ProyectoFinal_Version_2/publico/ [NC]
+
+# 4) Si el archivo/carpeta existe fisicamente, no reescribimos.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# 5) Todo lo demas va al front controller conservando la query string.
+RewriteRule ^(.*)$ publico/index.php?route=$1 [QSA,L]

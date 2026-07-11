@@ -11,11 +11,7 @@
     </div>
 <?php endif; ?>
 
-<form method="post" action="<?= e(url('roles.store')) ?>" class="form-card">
+<form method="post" action="<?= e(url('roles.store')) ?>">
     <?= csrf_field() ?>
     <?php require __DIR__ . '/_form.php'; ?>
-    <div class="actions">
-        <a href="<?= e(url('roles.index')) ?>" class="btn">Cancelar</a>
-        <button type="submit" class="btn primary">Guardar</button>
-    </div>
 </form>

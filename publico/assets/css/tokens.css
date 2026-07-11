@@ -1,0 +1,84 @@
+/* ── Design Tokens · modern-minimal ─────────────────────────────
+   Linear / Vercel posture: quiet, precise, software-native.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  /* Surface */
+  --bg:           oklch(99% 0.002 240);
+  --surface:      oklch(100% 0 0);
+  --surface-2:    oklch(97.5% 0.003 240);
+  --surface-3:    oklch(95% 0.004 240);
+
+  /* Ink */
+  --fg:           oklch(18% 0.012 250);
+  --fg-2:         oklch(30% 0.012 250);
+  --muted:        oklch(54% 0.012 250);
+  --muted-2:      oklch(68% 0.008 250);
+
+  /* Lines */
+  --border:       oklch(85% 0.008 250);
+  --border-2:     oklch(78% 0.010 250);
+  --ring:         oklch(58% 0.18 255 / 0.20);
+
+  /* Brand */
+  --accent:       oklch(58% 0.18 255);
+  --accent-2:     oklch(50% 0.20 255);
+  --accent-soft:  oklch(95% 0.03 255);
+
+  /* Status */
+  --ok:           oklch(58% 0.16 145);
+  --ok-soft:      oklch(95% 0.04 145);
+  --warn:         oklch(72% 0.16 70);
+  --warn-soft:    oklch(96% 0.05 80);
+  --danger:       oklch(60% 0.20 25);
+  --danger-soft:  oklch(95% 0.04 25);
+  --info:         oklch(62% 0.13 230);
+  --info-soft:    oklch(95% 0.03 230);
+
+  /* Type */
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono:    ui-monospace, "JetBrains Mono", "IBM Plex Mono", "SF Mono", Menlo, monospace;
+
+  /* Radius */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 22px;
+
+  /* Spacing scale (4px base) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+
+  /* Elevation (modals/dropdowns only) */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.04);
+  --shadow-md: 0 4px 12px oklch(0% 0 0 / 0.08);
+  --shadow-lg: 0 20px 48px oklch(0% 0 0 / 0.14);
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --t-fast: 120ms;
+  --t-med:  200ms;
+
+  /* Charts (Chart.js lee estas vars) */
+  --chart-1: oklch(58% 0.18 255);
+  --chart-2: oklch(60% 0.20 25);
+  --chart-3: oklch(58% 0.16 145);
+  --chart-4: oklch(72% 0.16 70);
+  --chart-5: oklch(62% 0.13 230);
+  --chart-6: oklch(50% 0.18 295);
+  --chart-grid: oklch(92% 0.005 250);
+  --chart-text: oklch(54% 0.012 250);
+
+  /* Layout */
+  --sidebar-w: 248px;
+  --topbar-h: 56px;
+  --content-max: 1280px;
+}

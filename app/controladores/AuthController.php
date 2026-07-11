@@ -73,4 +73,20 @@ final class AuthController
             'logs' => $this->usuarios->accessLogs(200),
         ]);
     }
+
+    public function heartbeat(): void
+    {
+        header('Content-Type: application/json');
+        if (!AuthService::check() || !AuthService::checkIdle()) {
+            http_response_code(401);
+            echo json_encode(['ok' => false, 'expired' => true]);
+            return;
+        }
+        AuthService::touch();
+        echo json_encode([
+            'ok' => true,
+            'seconds_left' => AuthService::idleSecondsLeft(),
+            'timeout' => AuthService::IDLE_TIMEOUT_SECONDS,
+        ]);
+    }
 }
