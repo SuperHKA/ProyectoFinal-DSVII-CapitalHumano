@@ -4,7 +4,28 @@ Sistema academico de gestion de Capital Humano desarrollado en PHP nativo con ar
 
 Aplicacion web completa para gestion de Capital Humano con autenticacion, control de acceso basado en roles (RBAC), exportacion a Excel y una API REST orientada a la Contraloria General.
 
-## Tecnologias
+---
+
+## Integrantes del Equipo
+* **Aaron Ortiz** - Cédula: 8-1029-2487 - Rol: Diseño Funcional y Arquitectura
+* **Orlando Valdez** - Cédula: 8-997-1296 - Rol: Diseño Funcional y Arquitectura
+* **Gustavo Dominguez** - Cédula: 20-43-7967 - Rol: Diseñador Frontend
+* **Andre Reboulet** - Cédula: 8-1026-1624 - Rol: Desarrollador Backend
+
+---
+
+## Fecha del Sistema y Versión
+* **Versión actual del software:** `v2.0.0`
+* **Fecha:** [15/7/2026]
+
+---
+
+## Demostración en Video
+[![Ver Demostración en Video](https://img.shields.io/badge/Video_Demostrativo-Ver_en_YouTube-red?style=for-the-badge&logo=youtube)]([Colocar enlace directo a YouTube o Drive aquí])
+
+> **Nota:** En este enlace directo se encuentra la sustentación del grupo, la ejecución del sistema y la explicación correspondiente.
+
+## Entorno de Ejecución
 
 - PHP 8.1 o superior.
 - MySQL o MariaDB.
@@ -14,24 +35,6 @@ Aplicacion web completa para gestion de Capital Humano con autenticacion, contro
 - OpenSSL para firma y verificacion de datos sensibles.
 - PhpSpreadsheet para exportar reportes `.xlsx`.
 - HTML5, CSS3 y JavaScript basico.
-
-## Base de datos
-
-El script unificado crea la base `CapitalHumano` desde cero con todas las tablas requeridas por Contexto.md:
-
-```text
-database/capital_humano.sql
-```
-
-Tablas incluidas:
-
-- `colaboradores`, `perfiles_laborales`, `historial_academico`, `solicitudes_vacaciones`
-- `departamentos`, `cat_estados_colaborador`
-- `historial_academico`, `solicitudes_vacaciones`
-- `usuarios`, `roles`, `permisos`, `usuario_rol`, `rol_permiso`, `bitacora_accesos`
-- Catalogos: `cat_ocupaciones`, `cat_tipoempleado`, `cat_tipos_planilla`, `cat_motivos_terminacion`, `cat_estadocivil`
-
-No incluye tablas del modulo anterior de inscripciones (`inscriptores` e `inscriptor_temas`) ni catalogos no solicitados como paises, tipos de sangre o rutas.
 
 ## Instalacion
 
@@ -69,13 +72,49 @@ database/capital_humano.sql
 ```text
 http://localhost/Software7/Proyectos/Software7-ProyectoFinal_Version_2/publico/index.php
 ```
+## Base de datos
+
+El script unificado crea la base `CapitalHumano` desde cero con todas las tablas requeridas por Contexto.md:
+
+```text
+database/capital_humano.sql
+```
+
+Tablas incluidas:
+
+- `colaboradores`, `perfiles_laborales`, `historial_academico`, `solicitudes_vacaciones`
+- `departamentos`, `cat_estados_colaborador`
+- `historial_academico`, `solicitudes_vacaciones`
+- `usuarios`, `roles`, `permisos`, `usuario_rol`, `rol_permiso`, `bitacora_accesos`
+- Catalogos: `cat_ocupaciones`, `cat_tipoempleado`, `cat_tipos_planilla`, `cat_motivos_terminacion`, `cat_estadocivil`
 
 
 ## Credenciales de prueba
 
-| Usuario | Contrasena | Rol            |
-| ------- | ---------- | -------------- |
-| admin   | Admin123!  | Administrador  |
+| Usuario | Contrasena | Rol            | Decripción |
+| ------- | ---------- | -------------- |------------|
+| admin   | Admin123!  | Administrador  | Acceso total: usuarios, roles, colaboradores, reportes, vacaciones. |
+| consultor   | Consultor123!  | Consultor  | Solo lectura de reportes, No puede descargar los reportes en formato xlxs. |
+| operador   | Operador123!  | Operador  | Gestión diaria de colaboradores, vacaciones y reportes. |
+
+## Directrices Técnicas 
+### Control de Acceso Seguro
+- Las contraseñas deben tener una longitud obligatoria de 8 a 12 caracteres, lo que reduce la vulnerabilidad frente a ataques por fuerza bruta y obliga a crear credenciales más robustas.
+- El sistema bloquea automáticamente una cuenta al tercer intento fallido, limitando los accesos no autorizados y protegiendo la sesión frente a ataques de adivinanza.
+- Cada intento de acceso, éxito o fallo, queda registrado en la bitácora de logs con información relevante como usuario, IP, fecha y detalle del evento, permitiendo auditoría y trazabilidad.
+- En la arquitectura, esta regla se implementa principalmente en los archivos [app/servicios/AuthService.php](app/servicios/AuthService.php), [app/modelos/Usuario.php](app/modelos/Usuario.php) y [app/controladores/AuthController.php](app/controladores/AuthController.php).
+
+### Mitigación OWASP y DRY
+- Se implementan tokens CSRF en los formularios para evitar solicitudes forjadas desde herramientas externas como Postman o sitios maliciosos, protegiendo acciones sensibles del sistema.
+- La arquitectura sigue una separación clara entre controladores, modelos, servicios y vistas, lo que evita duplicación de lógica y facilita el mantenimiento, la escalabilidad y la revisión de seguridad.
+- Además, las entradas del usuario se validan y sanitizan antes de procesarse, reduciendo el riesgo de inyecciones y errores de manipulación de datos.
+- En la arquitectura, esta regla se refleja en [app/utilidades/Sanitizer.php](app/utilidades/Sanitizer.php), [app/utilidades/Validator.php](app/utilidades/Validator.php), [app/controladores](app/controladores) y las vistas de [app/vistas](app/vistas).
+
+### Sello de Integridad
+- El backend genera una firma digital OpenSSL cada vez que se guarda un registro crítico, usando información del dato y un par de claves para producir un sello único e inalterable.
+- Esta firma protege la información en reposo contra manipulaciones directas en la base de datos, como cambios no autorizados de salarios, reservas, ventas o equipos en la CMDB.
+- Al consultar un registro, el sistema recalcula la firma y la compara con la almacenada; si existe una diferencia, se detecta una posible alteración y se alerta sobre una violación de integridad.
+- En la arquitectura, esta regla se implementa en [app/servicios/IntegrityService.php](app/servicios/IntegrityService.php), [app/modelos/Colaborador.php](app/modelos/Colaborador.php) y [app/vistas/reportes/index.php](app/vistas/reportes/index.php).
 
 ## Funcionalidades principales
 
@@ -194,14 +233,6 @@ Respuesta de ejemplo:
 }
 ```
 
-## Consideraciones de seguridad
-
-- Validaciones realizadas en el backend.
-- Contrasenas almacenadas con `password_hash` (bcrypt).
-- Longitud de contrasenas restringida entre 8 y 12 caracteres.
-- Separacion de responsabilidades siguiendo MVC.
-- Reutilizacion de conexion, validaciones y respuestas JSON (DRY).
-
 ## Backup
 
 Para generar un backup de la base de datos ejecuta desde la terminal:
@@ -218,9 +249,4 @@ El archivo SQL se guarda en `almacenamiento/exports/` con fecha y hora.
 - `docs/diccionario_datos.md` — descripcion de tablas y columnas.
 - `docs/manual_usuario.md` — manual con capturas de pantalla (guardar imagenes en `docs/capturas/`).
 
-## Autor
 
-- Andre Reboulet
-- Cedula: 8-1026-1624
-- Grupo: 1GS131
-- Profesora: Irina Fong
