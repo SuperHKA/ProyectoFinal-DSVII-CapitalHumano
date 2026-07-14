@@ -102,19 +102,19 @@ Tablas incluidas:
 - Las contraseñas deben tener una longitud obligatoria de 8 a 12 caracteres, lo que reduce la vulnerabilidad frente a ataques por fuerza bruta y obliga a crear credenciales más robustas.
 - El sistema bloquea automáticamente una cuenta al tercer intento fallido, limitando los accesos no autorizados y protegiendo la sesión frente a ataques de adivinanza.
 - Cada intento de acceso, éxito o fallo, queda registrado en la bitácora de logs con información relevante como usuario, IP, fecha y detalle del evento, permitiendo auditoría y trazabilidad.
-- En la arquitectura, esta regla se implementa principalmente en los archivos [app/servicios/AuthService.php](app/servicios/AuthService.php), [app/modelos/Usuario.php](app/modelos/Usuario.php) y [app/controladores/AuthController.php](app/controladores/AuthController.php).
+- En la arquitectura, esta regla se implementa principalmente en los archivos `app/servicios/AuthService.php`, `app/modelos/Usuario.php` y `app/controladores/AuthController.php`.
 
 ### Mitigación OWASP y DRY
 - Se implementan tokens CSRF en los formularios para evitar solicitudes forjadas desde herramientas externas como Postman o sitios maliciosos, protegiendo acciones sensibles del sistema.
 - La arquitectura sigue una separación clara entre controladores, modelos, servicios y vistas, lo que evita duplicación de lógica y facilita el mantenimiento, la escalabilidad y la revisión de seguridad.
 - Además, las entradas del usuario se validan y sanitizan antes de procesarse, reduciendo el riesgo de inyecciones y errores de manipulación de datos.
-- En la arquitectura, esta regla se refleja en [app/utilidades/Sanitizer.php](app/utilidades/Sanitizer.php), [app/utilidades/Validator.php](app/utilidades/Validator.php), [app/controladores](app/controladores) y las vistas de [app/vistas](app/vistas).
+- En la arquitectura, esta regla se refleja en `app/utilidades/Sanitizer.php`, `app/utilidades/Validator.php`, `app/controladores` y las vistas de `app/vistas`.
 
 ### Sello de Integridad
 - El backend genera una firma digital OpenSSL cada vez que se guarda un registro crítico, usando información del dato y un par de claves para producir un sello único e inalterable.
 - Esta firma protege la información en reposo contra manipulaciones directas en la base de datos, como cambios no autorizados de salarios, reservas, ventas o equipos en la CMDB.
 - Al consultar un registro, el sistema recalcula la firma y la compara con la almacenada; si existe una diferencia, se detecta una posible alteración y se alerta sobre una violación de integridad.
-- En la arquitectura, esta regla se implementa en [app/servicios/IntegrityService.php](app/servicios/IntegrityService.php), [app/modelos/Colaborador.php](app/modelos/Colaborador.php) y [app/vistas/reportes/index.php](app/vistas/reportes/index.php).
+- En la arquitectura, esta regla se implementa en `app/servicios/IntegrityService.php`, `app/modelos/Colaborador.php` y `app/vistas/reportes/index.php`.
 
 ## Funcionalidades principales
 
