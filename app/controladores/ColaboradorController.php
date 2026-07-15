@@ -62,14 +62,10 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'crear');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = Sanitizer::colaborador($_POST);
             $errors = Validator::colaborador($data, $this->catalogos->formCatalogs());
-            if ($errors) {
-                FormState::flash($data, $errors);
-                redirect_to('colaboradores.create');
-            }
+            redirect_if_invalid($data, $errors, 'colaboradores.create');
 
             $data['fotografia'] = $this->uploads->uploadImage($_FILES['fotografia'] ?? [], 'fotos');
             $id = $this->colaboradores->create($data);
@@ -85,11 +81,7 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'editar');
         $id = Sanitizer::int($_GET['id'] ?? 0);
-        $colaborador = $this->colaboradores->find($id);
-        if (!$colaborador) {
-            flash('error', 'El colaborador solicitado no existe.');
-            redirect_to('colaboradores.index');
-        }
+        $colaborador = $this->findOrRedirect($id);
 
         render_view('colaboradores/edit', [
             'title' => 'Editar colaborador',
@@ -105,14 +97,10 @@ final class ColaboradorController
         AuthService::ensure('colaboradores', 'editar');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = Sanitizer::colaborador($_POST);
             $errors = Validator::colaborador($data, $this->catalogos->formCatalogs());
-            if ($errors) {
-                FormState::flash($data, $errors);
-                redirect_to('colaboradores.edit', ['id' => $id]);
-            }
+            redirect_if_invalid($data, $errors, 'colaboradores.edit', ['id' => $id]);
 
             $foto = $this->uploads->uploadImage($_FILES['fotografia'] ?? [], 'fotos');
             if ($foto !== null) {
@@ -131,11 +119,7 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'ver');
         $id = Sanitizer::int($_GET['id'] ?? 0);
-        $colaborador = $this->colaboradores->find($id);
-        if (!$colaborador) {
-            flash('error', 'El colaborador solicitado no existe.');
-            redirect_to('colaboradores.index');
-        }
+        $colaborador = $this->findOrRedirect($id);
 
         render_view('colaboradores/show', [
             'title' => 'Detalle del colaborador',
@@ -148,11 +132,7 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'promover');
         $id = Sanitizer::int($_GET['id'] ?? 0);
-        $colaborador = $this->colaboradores->find($id);
-        if (!$colaborador) {
-            flash('error', 'El colaborador solicitado no existe.');
-            redirect_to('colaboradores.index');
-        }
+        $colaborador = $this->findOrRedirect($id);
 
         render_view('colaboradores/promote', [
             'title' => 'Registrar promocion',
@@ -168,14 +148,10 @@ final class ColaboradorController
         AuthService::ensure('colaboradores', 'promover');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = Sanitizer::perfilLaboral($_POST);
             $errors = Validator::perfilLaboral($data, $this->catalogos->formCatalogs());
-            if ($errors) {
-                FormState::flash($data, $errors);
-                redirect_to('colaboradores.promoteForm', ['id' => $id]);
-            }
+            redirect_if_invalid($data, $errors, 'colaboradores.promoteForm', ['id' => $id]);
 
             $this->colaboradores->promote($id, $data);
             flash('success', 'Promocion registrada y cargo anterior desactivado.');
@@ -190,11 +166,7 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'baja');
         $id = Sanitizer::int($_GET['id'] ?? 0);
-        $colaborador = $this->colaboradores->find($id);
-        if (!$colaborador) {
-            flash('error', 'El colaborador solicitado no existe.');
-            redirect_to('colaboradores.index');
-        }
+        $colaborador = $this->findOrRedirect($id);
 
         render_view('colaboradores/baja', [
             'title' => 'Registrar baja',
@@ -210,14 +182,10 @@ final class ColaboradorController
         AuthService::ensure('colaboradores', 'baja');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = Sanitizer::baja($_POST);
             $errors = Validator::baja($data, $this->catalogos->formCatalogs());
-            if ($errors) {
-                FormState::flash($data, $errors);
-                redirect_to('colaboradores.bajaForm', ['id' => $id]);
-            }
+            redirect_if_invalid($data, $errors, 'colaboradores.bajaForm', ['id' => $id]);
 
             $this->colaboradores->baja($id, $data);
             flash('success', 'Baja registrada correctamente.');
@@ -228,12 +196,57 @@ final class ColaboradorController
         }
     }
 
+    public function reincorporateForm(): void
+    {
+        AuthService::ensure('colaboradores', 'reincorporar');
+        $id = Sanitizer::int($_GET['id'] ?? 0);
+        $colaborador = $this->findOrRedirect($id);
+        if ((int) $colaborador['empleado_activo'] === 1) {
+            flash('error', 'El colaborador ya se encuentra activo.');
+            redirect_to('colaboradores.show', ['id' => $id]);
+        }
+
+        render_view('colaboradores/reincorporate', [
+            'title' => 'Reincorporar colaborador',
+            'colaborador' => $colaborador,
+            'catalogos' => $this->catalogos->formCatalogs(),
+            'old' => FormState::old(),
+            'errors' => FormState::errors(),
+        ]);
+    }
+
+    public function reincorporate(): void
+    {
+        AuthService::ensure('colaboradores', 'reincorporar');
+        $id = Sanitizer::int($_GET['id'] ?? 0);
+        try {
+            require_secure_post();
+            $data = Sanitizer::perfilLaboral($_POST);
+            $errors = Validator::perfilLaboral($data, $this->catalogos->formCatalogs());
+            redirect_if_invalid($data, $errors, 'colaboradores.reincorporateForm', ['id' => $id]);
+
+            $this->colaboradores->reincorporate($id, $data);
+            flash('success', 'Colaborador reincorporado con un nuevo periodo laboral.');
+            redirect_to('colaboradores.show', ['id' => $id]);
+        } catch (Throwable $exception) {
+            $knownMessages = [
+                'El colaborador solicitado no existe.',
+                'El colaborador ya se encuentra activo.',
+                'La reincorporacion debe iniciar despues de la ultima fecha de baja.',
+            ];
+            $message = in_array($exception->getMessage(), $knownMessages, true)
+                ? $exception->getMessage()
+                : safe_error_message($exception, 'No fue posible reincorporar al colaborador.', ['module' => 'colaboradores', 'action' => 'reincorporate']);
+            FormState::flash($_POST, [$message]);
+            redirect_to('colaboradores.reincorporateForm', ['id' => $id]);
+        }
+    }
+
     public function destroy(): void
     {
         AuthService::ensure('colaboradores', 'eliminar');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $this->colaboradores->delete(Sanitizer::int($_GET['id'] ?? 0));
             flash('success', 'Colaborador eliminado correctamente.');
         } catch (Throwable $exception) {
@@ -247,8 +260,7 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'editar');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = [
                 'colaborador_id' => Sanitizer::int($_GET['id'] ?? 0),
                 'titulo' => Sanitizer::text($_POST['titulo'] ?? ''),
@@ -272,8 +284,7 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'editar');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $id = Sanitizer::int($_GET['id'] ?? 0);
             $this->historial->delete($id);
             flash('success', 'Registro eliminado.');
@@ -281,5 +292,19 @@ final class ColaboradorController
             flash('error', safe_error_message($exception, 'No fue posible eliminar el registro academico.', ['module' => 'historial', 'action' => 'delete']));
         }
         redirect_to('colaboradores.show', ['id' => Sanitizer::int($_GET['colaborador_id'] ?? 0)]);
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function findOrRedirect(int $id): array
+    {
+        $colaborador = $this->colaboradores->find($id);
+        if ($colaborador === null) {
+            flash('error', 'El colaborador solicitado no existe.');
+            redirect_to('colaboradores.index');
+        }
+
+        return $colaborador;
     }
 }

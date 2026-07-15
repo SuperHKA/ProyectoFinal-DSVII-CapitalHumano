@@ -73,6 +73,7 @@ Si se actualiza una instalación anterior, ejecutar una sola vez:
 
 ```text
 database/migrations/20260714_completar_vacaciones.sql
+database/migrations/20260714_reincorporacion.sql
 ```
 
 4. Generar una credencial exclusiva para la API de Contraloría y guardarla en `.env`:
@@ -85,7 +86,16 @@ php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
 CONTRALORIA_API_TOKEN=valor_generado
 ```
 
-5. Abrir:
+5. Dar al usuario del servidor web acceso de solo lectura a la clave privada de firma. En Arch Linux/Apache, por ejemplo:
+
+```bash
+setfacl -m u:http:r config/keys/private.pem
+setfacl -m u:http:rwx almacenamiento/logs
+```
+
+El segundo permiso permite guardar los errores sin hacer público el directorio. No se debe usar `chmod 644` para la clave privada ni `chmod 777` para los logs. En otros servidores, sustituir `http` por el usuario real de PHP/Apache.
+
+6. Abrir:
 
 ```text
 http://localhost/Software7/Proyectos/Software7-ProyectoFinal_Version_2/publico/index.php
@@ -164,6 +174,7 @@ Tablas incluidas:
 - Perfil laboral inicial: ocupacion, tipo de empleado, planilla, departamento, salario y fecha de inicio.
 - Promociones: crea un nuevo cargo y desactiva el anterior.
 - Bajas: guarda fecha fin, motivo, desactiva cargo y empleado.
+- Reincorporaciones: abren un nuevo periodo laboral, conservan la baja y los cargos anteriores, y activan nuevamente al colaborador.
 - Historial academico con titulos e instituciones, adjuntando archivos PDF.
 - Edad calculada automaticamente a partir de la fecha de nacimiento.
 
@@ -294,4 +305,3 @@ El archivo SQL se guarda en `almacenamiento/exports/` con fecha y hora.
 - `docs/uml.md` — diagramas UML (actores, casos de uso, clases, estados, secuencia y DER).
 - `docs/diccionario_datos.md` — descripcion de tablas y columnas.
 - `docs/manual_usuario.md` — manual con capturas de pantalla (guardar imagenes en `docs/capturas/`).
-

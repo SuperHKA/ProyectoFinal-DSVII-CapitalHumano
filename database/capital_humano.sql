@@ -989,6 +989,7 @@ INSERT INTO permisos (modulo, accion, descripcion) VALUES
 ('colaboradores', 'eliminar', 'Eliminar colaboradores'),
 ('colaboradores', 'promover', 'Registrar promociones'),
 ('colaboradores', 'baja', 'Registrar bajas'),
+('colaboradores', 'reincorporar', 'Reincorporar colaboradores dados de baja'),
 ('reportes', 'ver', 'Ver reportes'),
 ('reportes', 'exportar', 'Exportar reportes a Excel'),
 ('usuarios', 'ver', 'Ver usuarios'),

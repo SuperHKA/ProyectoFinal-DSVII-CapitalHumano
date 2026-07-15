@@ -31,24 +31,30 @@
 </form>
 
 <section class="stats">
-    <h2>Estadisticas</h2>
+    <div class="stats-heading">
+        <div>
+            <h2>Estadísticas</h2>
+            <p>Distribución general; el contador respeta los filtros aplicados.</p>
+        </div>
+        <span class="stats-total"><strong><?= e($paginacion['total']) ?></strong> resultados</span>
+    </div>
     <div class="stats-grid">
         <div class="stat-card">
-            <strong>Por sexo</strong>
+            <header class="stat-card__head"><span>01</span><strong>Por sexo</strong></header>
             <?php foreach ($por_sexo as $s): ?>
-                <div><?= e($s['sexo']) ?>: <?= e($s['total']) ?></div>
+                <div><span><?= e($s['sexo']) ?></span><b><?= e($s['total']) ?></b></div>
             <?php endforeach; ?>
         </div>
         <div class="stat-card">
-            <strong>Por dirección</strong>
+            <header class="stat-card__head"><span>02</span><strong>Por dirección</strong></header>
             <?php foreach ($por_direccion as $d): ?>
-                <div><?= e($d['direccion']) ?>: <?= e($d['total']) ?></div>
+                <div><span><?= e($d['direccion']) ?></span><b><?= e($d['total']) ?></b></div>
             <?php endforeach; ?>
         </div>
         <div class="stat-card">
-            <strong>Por rango de edad</strong>
+            <header class="stat-card__head"><span>03</span><strong>Por rango de edad</strong></header>
             <?php foreach ($por_edad as $e): ?>
-                <div><?= e($e['rango']) ?>: <?= e($e['total']) ?></div>
+                <div><span><?= e($e['rango']) ?></span><b><?= e($e['total']) ?></b></div>
             <?php endforeach; ?>
         </div>
     </div>

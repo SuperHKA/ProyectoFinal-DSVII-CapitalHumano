@@ -54,8 +54,7 @@ final class VacacionController
     {
         AuthService::ensure('vacaciones', 'crear');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = [
                 'colaborador_id' => Sanitizer::int($_POST['colaborador_id'] ?? 0),
                 'fecha_inicio' => Sanitizer::text($_POST['fecha_inicio'] ?? ''),
@@ -63,10 +62,7 @@ final class VacacionController
                 'observaciones' => Sanitizer::text($_POST['observaciones'] ?? ''),
             ];
             $errors = Validator::vacacion($data);
-            if ($errors) {
-                FormState::flash($data, $errors);
-                redirect_to('vacaciones.create');
-            }
+            redirect_if_invalid($data, $errors, 'vacaciones.create');
 
             $this->vacaciones->create($data);
             flash('success', 'Solicitud registrada correctamente.');
@@ -82,8 +78,7 @@ final class VacacionController
     {
         AuthService::ensure('vacaciones', 'crear');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $this->vacaciones->aprobar(
                 Sanitizer::int($_GET['id'] ?? 0),
                 (int) (AuthService::user()['id'] ?? 0)
@@ -100,8 +95,7 @@ final class VacacionController
     {
         AuthService::ensure('vacaciones', 'crear');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $this->vacaciones->rechazar(Sanitizer::int($_GET['id'] ?? 0));
             flash('success', 'Solicitud rechazada.');
         } catch (Throwable $exception) {

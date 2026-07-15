@@ -153,6 +153,32 @@ function require_post(): void
 }
 
 /**
+ * Aplica de forma uniforme las protecciones de toda accion mutable.
+ */
+function require_secure_post(): void
+{
+    require_post();
+    verify_csrf();
+}
+
+/**
+ * Conserva los datos y vuelve al formulario cuando la validacion falla.
+ *
+ * @param array<string,mixed> $data
+ * @param array<int,string> $errors
+ * @param array<string,int|string> $params
+ */
+function redirect_if_invalid(array $data, array $errors, string $route, array $params = []): void
+{
+    if ($errors === []) {
+        return;
+    }
+
+    \App\Utilidades\FormState::flash($data, $errors);
+    redirect_to($route, $params);
+}
+
+/**
  * Marca una opcion select como elegida.
  */
 function selected(mixed $current, mixed $expected): string

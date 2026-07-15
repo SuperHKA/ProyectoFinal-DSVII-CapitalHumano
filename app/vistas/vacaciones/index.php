@@ -9,9 +9,9 @@
 </section>
 
 <section class="vacation-stats" aria-label="Resumen de solicitudes">
-    <article><span>Pendientes</span><strong><?= e($resumen['Pendiente']) ?></strong></article>
-    <article><span>Aprobadas</span><strong><?= e($resumen['Aprobada']) ?></strong></article>
-    <article><span>Rechazadas</span><strong><?= e($resumen['Rechazada']) ?></strong></article>
+    <article class="pending"><span>Pendientes<small>Requieren revisión</small></span><strong><?= e($resumen['Pendiente']) ?></strong></article>
+    <article class="approved"><span>Aprobadas<small>Con saldo aplicado</small></span><strong><?= e($resumen['Aprobada']) ?></strong></article>
+    <article class="rejected"><span>Rechazadas<small>Solicitudes cerradas</small></span><strong><?= e($resumen['Rechazada']) ?></strong></article>
 </section>
 
 <div class="table-wrap">

@@ -19,7 +19,10 @@
     </div>
 </div>
 <div class="field">
-    <label>Roles</label>
+    <div class="field-heading">
+        <label>Roles asignados</label>
+        <small>Definen los módulos y acciones disponibles para este usuario.</small>
+    </div>
     <div class="checkbox-group">
     <?php foreach ($roles as $rol): ?>
         <?php
@@ -39,6 +42,6 @@
 <div class="field inline">
     <label class="checkbox">
         <input type="checkbox" name="activo" value="1" <?= (int) ($old['activo'] ?? $usuario['activo'] ?? 1) === 1 ? 'checked' : '' ?>>
-        Usuario activo
+        <span><strong>Usuario activo</strong><small>Puede iniciar sesión y utilizar los permisos de sus roles.</small></span>
     </label>
 </div>

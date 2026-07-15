@@ -18,6 +18,9 @@
         <?php if (\App\Servicios\AuthService::can('colaboradores', 'baja') && (int) $colaborador['empleado_activo'] === 1): ?>
             <a class="action-btn danger-soft large" href="<?= e(url('colaboradores.bajaForm', ['id' => $colaborador['id']])) ?>">Baja</a>
         <?php endif; ?>
+        <?php if (\App\Servicios\AuthService::can('colaboradores', 'reincorporar') && (int) $colaborador['empleado_activo'] === 0): ?>
+            <a class="action-btn rehire large" href="<?= e(url('colaboradores.reincorporateForm', ['id' => $colaborador['id']])) ?>">Reincorporar</a>
+        <?php endif; ?>
         <?php if (\App\Servicios\AuthService::can('colaboradores', 'eliminar')): ?>
             <form method="post" action="<?= e(url('colaboradores.destroy', ['id' => $colaborador['id']])) ?>" onsubmit="return confirm('Desea eliminar este colaborador?')">
                 <?= csrf_field() ?>

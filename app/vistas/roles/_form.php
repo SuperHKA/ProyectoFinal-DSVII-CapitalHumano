@@ -1,17 +1,25 @@
-<div class="field">
-    <label for="nombre">Nombre del rol</label>
-    <input type="text" id="nombre" name="nombre" value="<?= e($old['nombre'] ?? $rol['nombre'] ?? '') ?>" required>
+<div class="row-two">
+    <div class="field">
+        <label for="nombre">Nombre del rol</label>
+        <input type="text" id="nombre" name="nombre" value="<?= e($old['nombre'] ?? $rol['nombre'] ?? '') ?>" required>
+    </div>
+    <div class="field">
+        <label for="descripcion">Descripción</label>
+        <input type="text" id="descripcion" name="descripcion" value="<?= e($old['descripcion'] ?? $rol['descripcion'] ?? '') ?>">
+    </div>
 </div>
 <div class="field">
-    <label for="descripcion">Descripcion</label>
-    <input type="text" id="descripcion" name="descripcion" value="<?= e($old['descripcion'] ?? $rol['descripcion'] ?? '') ?>">
-</div>
-<div class="field">
-    <label>Permisos por modulo</label>
+    <div class="field-heading">
+        <label>Permisos por módulo</label>
+        <small>Seleccione únicamente las acciones necesarias para este rol.</small>
+    </div>
     <div class="permissions-grid">
     <?php foreach ($modulos as $modulo => $permisos): ?>
         <div class="permission-module">
-            <strong><?= e(ucfirst($modulo)) ?></strong>
+            <header>
+                <strong><?= e(ucfirst($modulo)) ?></strong>
+                <span><?= e(count($permisos)) ?> acciones</span>
+            </header>
             <?php foreach ($permisos as $permiso): ?>
                 <?php
                     $checked = '';
@@ -32,6 +40,6 @@
 <div class="field inline">
     <label class="checkbox">
         <input type="checkbox" name="activo" value="1" <?= (int) ($old['activo'] ?? $rol['activo'] ?? 1) === 1 ? 'checked' : '' ?>>
-        Rol activo
+        <span><strong>Rol activo</strong><small>Sus permisos se aplicarán a los usuarios que lo tengan asignado.</small></span>
     </label>
 </div>

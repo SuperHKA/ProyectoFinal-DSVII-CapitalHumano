@@ -223,14 +223,6 @@ final class Usuario
     }
 
     /**
-     * @return array<int,array<string,mixed>>
-     */
-    public function roles(): array
-    {
-        return $this->db->query('SELECT * FROM roles ORDER BY nombre')->fetchAll();
-    }
-
-    /**
      * @return array<int,int>
      */
     public function permissionIds(int $usuarioId): array

@@ -37,11 +37,31 @@ final class AuthController
         ]);
     }
 
+    public function home(): never
+    {
+        AuthService::requireAuth();
+
+        $destinations = [
+            ['colaboradores', 'ver', 'colaboradores.index'],
+            ['reportes', 'ver', 'reportes.index'],
+            ['vacaciones', 'ver', 'vacaciones.index'],
+            ['usuarios', 'ver', 'usuarios.index'],
+            ['roles', 'ver', 'roles.index'],
+        ];
+
+        foreach ($destinations as [$module, $action, $route]) {
+            if (AuthService::can($module, $action)) {
+                redirect_to($route);
+            }
+        }
+
+        redirect_to('public.home');
+    }
+
     public function login(): void
     {
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $usuario = Sanitizer::text($_POST['usuario'] ?? '');
             $password = $_POST['password'] ?? '';
 
@@ -69,8 +89,7 @@ final class AuthController
 
     public function logout(): void
     {
-        require_post();
-        verify_csrf();
+        require_secure_post();
         $this->auth->logout();
         flash('success', 'Sesion cerrada correctamente.');
         redirect_to('login');

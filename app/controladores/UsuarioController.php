@@ -50,14 +50,10 @@ final class UsuarioController
     {
         AuthService::ensure('usuarios', 'crear');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = Sanitizer::usuario($_POST);
             $errors = Validator::usuario($data, true);
-            if ($errors) {
-                FormState::flash($data, $errors);
-                redirect_to('usuarios.create');
-            }
+            redirect_if_invalid($data, $errors, 'usuarios.create');
 
             $this->usuarios->create($data);
             flash('success', 'Usuario creado correctamente.');
@@ -92,14 +88,10 @@ final class UsuarioController
         AuthService::ensure('usuarios', 'editar');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = Sanitizer::usuario($_POST);
             $errors = Validator::usuario($data, false);
-            if ($errors) {
-                FormState::flash($data, $errors);
-                redirect_to('usuarios.edit', ['id' => $id]);
-            }
+            redirect_if_invalid($data, $errors, 'usuarios.edit', ['id' => $id]);
 
             $this->usuarios->update($id, $data);
             flash('success', 'Usuario actualizado correctamente.');
@@ -114,8 +106,7 @@ final class UsuarioController
     {
         AuthService::ensure('usuarios', 'editar');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $id = Sanitizer::int($_GET['id'] ?? 0);
             $this->usuarios->toggleActive($id);
             flash('success', 'Estado del usuario actualizado.');

@@ -28,7 +28,9 @@ try {
         $status = 500;
         http_response_code($status);
     }
-    (new \App\Servicios\WebErrorHandler())->handle($exception);
+    if ($status >= 500) {
+        (new \App\Servicios\WebErrorHandler())->handle($exception);
+    }
     render_view('errors/generic', [
         'title' => $status === 403 ? 'Acceso denegado' : 'Error de aplicación',
         'status' => $status,

@@ -240,6 +240,60 @@ final class Colaborador
         }
     }
 
+    /**
+     * Crea un nuevo periodo laboral para una persona previamente dada de baja.
+     * El historial anterior se conserva sin modificaciones.
+     *
+     * @param array<string,mixed> $data
+     */
+    public function reincorporate(int $id, array $data): void
+    {
+        $this->db->beginTransaction();
+
+        try {
+            $statement = $this->db->prepare(
+                'SELECT empleado_activo
+                 FROM colaboradores
+                 WHERE id = :id
+                 FOR UPDATE'
+            );
+            $statement->execute(['id' => $id]);
+            $active = $statement->fetchColumn();
+            if ($active === false) {
+                throw new \RuntimeException('El colaborador solicitado no existe.');
+            }
+            if ((int) $active === 1) {
+                throw new \RuntimeException('El colaborador ya se encuentra activo.');
+            }
+
+            $statement = $this->db->prepare(
+                'SELECT MAX(fecha_fin)
+                 FROM perfiles_laborales
+                 WHERE colaborador_id = :id'
+            );
+            $statement->execute(['id' => $id]);
+            $lastEndDate = $statement->fetchColumn();
+            if (is_string($lastEndDate) && $lastEndDate !== '' && (string) $data['fecha_inicio'] <= $lastEndDate) {
+                throw new \RuntimeException('La reincorporacion debe iniciar despues de la ultima fecha de baja.');
+            }
+
+            $profileId = $this->createPerfil($id, $data);
+            $this->updatePerfilSignature($profileId);
+
+            $statement = $this->db->prepare(
+                'UPDATE colaboradores
+                 SET empleado_activo = 1, estado_colaborador_id = 1, motivo_baja_id = NULL
+                 WHERE id = :id'
+            );
+            $statement->execute(['id' => $id]);
+
+            $this->db->commit();
+        } catch (\Throwable $exception) {
+            $this->db->rollBack();
+            throw $exception;
+        }
+    }
+
     public function delete(int $id): void
     {
         $this->db->beginTransaction();

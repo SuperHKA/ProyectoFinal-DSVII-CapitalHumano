@@ -38,7 +38,7 @@ return [
     'roles.toggle' => [RolController::class, 'toggle'],
 
     // Colaboradores
-    'home' => [ColaboradorController::class, 'index'],
+    'home' => [AuthController::class, 'home'],
     'colaboradores.index' => [ColaboradorController::class, 'index'],
     'colaboradores.create' => [ColaboradorController::class, 'create'],
     'colaboradores.store' => [ColaboradorController::class, 'store'],
@@ -49,6 +49,8 @@ return [
     'colaboradores.promote' => [ColaboradorController::class, 'promote'],
     'colaboradores.bajaForm' => [ColaboradorController::class, 'bajaForm'],
     'colaboradores.baja' => [ColaboradorController::class, 'baja'],
+    'colaboradores.reincorporateForm' => [ColaboradorController::class, 'reincorporateForm'],
+    'colaboradores.reincorporate' => [ColaboradorController::class, 'reincorporate'],
     'colaboradores.destroy' => [ColaboradorController::class, 'destroy'],
     'colaboradores.historial.store' => [ColaboradorController::class, 'addHistorial'],
     'colaboradores.historial.destroy' => [ColaboradorController::class, 'removeHistorial'],

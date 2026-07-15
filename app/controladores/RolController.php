@@ -47,14 +47,10 @@ final class RolController
     {
         AuthService::ensure('roles', 'crear');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = Sanitizer::rol($_POST);
             $errors = Validator::rol($data);
-            if ($errors) {
-                FormState::flash($data, $errors);
-                redirect_to('roles.create');
-            }
+            redirect_if_invalid($data, $errors, 'roles.create');
 
             $this->roles->create($data);
             flash('success', 'Rol creado correctamente.');
@@ -89,14 +85,10 @@ final class RolController
         AuthService::ensure('roles', 'editar');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $data = Sanitizer::rol($_POST);
             $errors = Validator::rol($data);
-            if ($errors) {
-                FormState::flash($data, $errors);
-                redirect_to('roles.edit', ['id' => $id]);
-            }
+            redirect_if_invalid($data, $errors, 'roles.edit', ['id' => $id]);
 
             $this->roles->update($id, $data);
             flash('success', 'Rol actualizado correctamente.');
@@ -111,8 +103,7 @@ final class RolController
     {
         AuthService::ensure('roles', 'editar');
         try {
-            require_post();
-            verify_csrf();
+            require_secure_post();
             $id = Sanitizer::int($_GET['id'] ?? 0);
             $this->roles->toggleActive($id);
             flash('success', 'Estado del rol actualizado.');

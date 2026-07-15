@@ -55,6 +55,9 @@
                     <?php if (\App\Servicios\AuthService::can('colaboradores', 'baja') && (int) $row['empleado_activo'] === 1): ?>
                         <a class="action-btn danger-soft" href="<?= e(url('colaboradores.bajaForm', ['id' => $row['id']])) ?>">Baja</a>
                     <?php endif; ?>
+                    <?php if (\App\Servicios\AuthService::can('colaboradores', 'reincorporar') && (int) $row['empleado_activo'] === 0): ?>
+                        <a class="action-btn rehire" href="<?= e(url('colaboradores.reincorporateForm', ['id' => $row['id']])) ?>">Reincorporar</a>
+                    <?php endif; ?>
                     <?php if (\App\Servicios\AuthService::can('colaboradores', 'eliminar')): ?>
                         <form method="post" action="<?= e(url('colaboradores.destroy', ['id' => $row['id']])) ?>" class="inline" onsubmit="return confirm('¿Eliminar colaborador?')">
                             <?= csrf_field() ?>
@@ -81,4 +84,3 @@
     <?php endfor; ?>
 </div>
 <?php endif; ?>
-
