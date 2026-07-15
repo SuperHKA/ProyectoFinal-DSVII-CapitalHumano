@@ -16,7 +16,7 @@ Aplicacion web completa para gestion de Capital Humano con autenticacion, contro
 
 ## Fecha del Sistema y Versión
 * **Versión actual del software:** `v2.0.0`
-* **Fecha:** [15/7/2026]
+* **Fecha:** 15/7/2026
 
 ---
 
@@ -301,7 +301,5 @@ php database/backup.php
 El archivo SQL se guarda en `almacenamiento/exports/` con fecha y hora.
 
 ## Documentacion
-
-- `docs/uml.md` — diagramas UML (actores, casos de uso, clases, estados, secuencia y DER).
 - `docs/diccionario_datos.md` — descripcion de tablas y columnas.
-- `docs/manual_usuario.md` — manual con capturas de pantalla (guardar imagenes en `docs/capturas/`).
+- `docs/manual_usuario.md` — manual con capturas de pantalla.
