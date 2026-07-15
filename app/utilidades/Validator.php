@@ -194,12 +194,20 @@ final class Validator
         }
         if (!self::validDate((string) $data['fecha_inicio'])) {
             $errors[] = 'La fecha de inicio no es valida.';
+        } elseif (new \DateTimeImmutable((string) $data['fecha_inicio']) < new \DateTimeImmutable('today')) {
+            $errors[] = 'La fecha de inicio de las vacaciones no puede estar en el pasado.';
         }
         if (!self::validDate((string) $data['fecha_fin'])) {
             $errors[] = 'La fecha fin no es valida.';
         }
         if ((string) $data['fecha_inicio'] !== '' && (string) $data['fecha_fin'] !== '' && (string) $data['fecha_fin'] < (string) $data['fecha_inicio']) {
             $errors[] = 'La fecha fin no puede ser anterior a la fecha de inicio.';
+        } elseif (self::validDate((string) $data['fecha_inicio']) && self::validDate((string) $data['fecha_fin'])) {
+            $dias = (int) (new \DateTimeImmutable((string) $data['fecha_inicio']))
+                ->diff(new \DateTimeImmutable((string) $data['fecha_fin']))->days + 1;
+            if ($dias < 7) {
+                $errors[] = 'La solicitud de vacaciones debe ser de al menos 7 dias calendario.';
+            }
         }
         return $errors;
     }
@@ -244,7 +252,5 @@ final class Validator
         return $length >= 8 && $length <= 12;
     }
 }
-
-
 
 

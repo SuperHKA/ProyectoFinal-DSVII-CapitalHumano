@@ -42,6 +42,17 @@ final class Sanitizer
         return number_format((float) $normalized, 2, '.', '');
     }
 
+    public static function nullableMoney(mixed $value): ?float
+    {
+        $text = str_replace(',', '.', self::text($value));
+        if ($text === '') {
+            return null;
+        }
+
+        $filtered = filter_var($text, FILTER_VALIDATE_FLOAT);
+        return $filtered !== false && $filtered >= 0 ? round((float) $filtered, 2) : null;
+    }
+
     /**
      * @param array<string,mixed> $data
      * @return array<string,mixed>

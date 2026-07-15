@@ -40,6 +40,7 @@ final class AuthController
     public function login(): void
     {
         try {
+            require_post();
             verify_csrf();
             $usuario = Sanitizer::text($_POST['usuario'] ?? '');
             $password = $_POST['password'] ?? '';
@@ -53,13 +54,23 @@ final class AuthController
             flash('success', 'Bienvenido, ' . e(AuthService::user()['nombre'] ?? $usuario) . '.');
             redirect_to('home');
         } catch (Throwable $exception) {
-            FormState::flash($_POST, [$exception->getMessage()]);
+            $allowed = str_starts_with($exception->getMessage(), 'Credenciales incorrectas')
+                || str_starts_with($exception->getMessage(), 'Usuario desactivado')
+                || str_starts_with($exception->getMessage(), 'Cuenta bloqueada')
+                || str_starts_with($exception->getMessage(), 'La sesion expiro')
+                || str_starts_with($exception->getMessage(), 'Usuario y contrasena');
+            $message = $allowed
+                ? $exception->getMessage()
+                : safe_error_message($exception, 'No fue posible iniciar sesion.', ['module' => 'auth', 'action' => 'login']);
+            FormState::flash($_POST, [$message]);
             redirect_to('login');
         }
     }
 
     public function logout(): void
     {
+        require_post();
+        verify_csrf();
         $this->auth->logout();
         flash('success', 'Sesion cerrada correctamente.');
         redirect_to('login');

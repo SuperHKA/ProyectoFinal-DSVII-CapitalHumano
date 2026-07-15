@@ -4,7 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Sistema seguro de Capital Humano para gestionar trayectoria laboral, vacaciones, reportes e integridad de datos.">
     <title><?= e($title ?? $appConfig['name']) ?> | Sistema de Capital Humano</title>
+    <script>document.documentElement.classList.add('js');</script>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,11 +14,17 @@
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="<?= e(url('home')) ?>">Capital Humano</a>
+    <a class="brand" href="<?= e(url('public.home')) ?>">Capital Humano</a>
     <nav class="nav">
-        <a href="<?= e(url('home')) ?>" class="<?= ($_GET['route'] ?? 'home') === 'home' ? 'active' : '' ?>">Inicio</a>
+        <?php if (!\App\Servicios\AuthService::check()): ?>
+            <a href="<?= e(url('public.home')) ?>" class="<?= ($_GET['route'] ?? 'public.home') === 'public.home' ? 'active' : '' ?>">Conoce el sistema</a>
+            <a href="<?= e(url('public.home')) ?>#beneficios">Beneficios</a>
+            <a href="<?= e(url('public.home')) ?>#seguridad">Seguridad</a>
+        <?php else: ?>
+            <a href="<?= e(url('public.home')) ?>">Sitio público</a>
+        <?php endif; ?>
         <?php if (\App\Servicios\AuthService::can('colaboradores', 'ver')): ?>
-            <a href="<?= e(url('colaboradores.index')) ?>" class="<?= str_starts_with($_GET['route'] ?? '', 'colaboradores') ? 'active' : '' ?>">Colaboradores</a>
+            <a href="<?= e(url('colaboradores.index')) ?>" class="<?= (($_GET['route'] ?? '') === 'home' || str_starts_with($_GET['route'] ?? '', 'colaboradores')) ? 'active' : '' ?>">Colaboradores</a>
         <?php endif; ?>
         <?php if (\App\Servicios\AuthService::can('reportes', 'ver')): ?>
             <a href="<?= e(url('reportes.index')) ?>" class="<?= str_starts_with($_GET['route'] ?? '', 'reportes') ? 'active' : '' ?>">Reportes</a>

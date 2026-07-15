@@ -47,6 +47,7 @@ final class RolController
     {
         AuthService::ensure('roles', 'crear');
         try {
+            require_post();
             verify_csrf();
             $data = Sanitizer::rol($_POST);
             $errors = Validator::rol($data);
@@ -59,7 +60,7 @@ final class RolController
             flash('success', 'Rol creado correctamente.');
             redirect_to('roles.index');
         } catch (Throwable $exception) {
-            FormState::flash($_POST, [$exception->getMessage()]);
+            FormState::flash($_POST, [safe_error_message($exception, 'No fue posible crear el rol.', ['module' => 'roles', 'action' => 'create'])]);
             redirect_to('roles.create');
         }
     }
@@ -88,6 +89,7 @@ final class RolController
         AuthService::ensure('roles', 'editar');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
+            require_post();
             verify_csrf();
             $data = Sanitizer::rol($_POST);
             $errors = Validator::rol($data);
@@ -100,7 +102,7 @@ final class RolController
             flash('success', 'Rol actualizado correctamente.');
             redirect_to('roles.index');
         } catch (Throwable $exception) {
-            FormState::flash($_POST, [$exception->getMessage()]);
+            FormState::flash($_POST, [safe_error_message($exception, 'No fue posible actualizar el rol.', ['module' => 'roles', 'action' => 'update'])]);
             redirect_to('roles.edit', ['id' => $id]);
         }
     }
@@ -109,12 +111,13 @@ final class RolController
     {
         AuthService::ensure('roles', 'editar');
         try {
+            require_post();
             verify_csrf();
             $id = Sanitizer::int($_GET['id'] ?? 0);
             $this->roles->toggleActive($id);
             flash('success', 'Estado del rol actualizado.');
         } catch (Throwable $exception) {
-            flash('error', $exception->getMessage());
+            flash('error', safe_error_message($exception, 'No fue posible cambiar el estado del rol.', ['module' => 'roles', 'action' => 'toggle']));
         }
         redirect_to('roles.index');
     }

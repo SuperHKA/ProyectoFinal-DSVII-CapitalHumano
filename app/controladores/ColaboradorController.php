@@ -62,6 +62,7 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'crear');
         try {
+            require_post();
             verify_csrf();
             $data = Sanitizer::colaborador($_POST);
             $errors = Validator::colaborador($data, $this->catalogos->formCatalogs());
@@ -75,8 +76,7 @@ final class ColaboradorController
             flash('success', 'Colaborador registrado correctamente.');
             redirect_to('colaboradores.show', ['id' => $id]);
         } catch (Throwable $exception) {
-            log_exception($exception);
-            FormState::flash($_POST, [$exception->getMessage() . ' — revisa almacenamiento/logs/app.log']);
+            FormState::flash($_POST, [safe_error_message($exception, 'No fue posible registrar el colaborador.', ['module' => 'colaboradores', 'action' => 'create'])]);
             redirect_to('colaboradores.create');
         }
     }
@@ -105,6 +105,7 @@ final class ColaboradorController
         AuthService::ensure('colaboradores', 'editar');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
+            require_post();
             verify_csrf();
             $data = Sanitizer::colaborador($_POST);
             $errors = Validator::colaborador($data, $this->catalogos->formCatalogs());
@@ -121,8 +122,7 @@ final class ColaboradorController
             flash('success', 'Colaborador actualizado correctamente.');
             redirect_to('colaboradores.show', ['id' => $id]);
         } catch (Throwable $exception) {
-            log_exception($exception);
-            FormState::flash($_POST, [$exception->getMessage() . ' — revisa almacenamiento/logs/app.log']);
+            FormState::flash($_POST, [safe_error_message($exception, 'No fue posible actualizar el colaborador.', ['module' => 'colaboradores', 'action' => 'update'])]);
             redirect_to('colaboradores.edit', ['id' => $id]);
         }
     }
@@ -168,6 +168,7 @@ final class ColaboradorController
         AuthService::ensure('colaboradores', 'promover');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
+            require_post();
             verify_csrf();
             $data = Sanitizer::perfilLaboral($_POST);
             $errors = Validator::perfilLaboral($data, $this->catalogos->formCatalogs());
@@ -180,8 +181,7 @@ final class ColaboradorController
             flash('success', 'Promocion registrada y cargo anterior desactivado.');
             redirect_to('colaboradores.show', ['id' => $id]);
         } catch (Throwable $exception) {
-            log_exception($exception);
-            FormState::flash($_POST, [$exception->getMessage() . ' — revisa almacenamiento/logs/app.log']);
+            FormState::flash($_POST, [safe_error_message($exception, 'No fue posible registrar la promocion.', ['module' => 'colaboradores', 'action' => 'promote'])]);
             redirect_to('colaboradores.promoteForm', ['id' => $id]);
         }
     }
@@ -210,6 +210,7 @@ final class ColaboradorController
         AuthService::ensure('colaboradores', 'baja');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
+            require_post();
             verify_csrf();
             $data = Sanitizer::baja($_POST);
             $errors = Validator::baja($data, $this->catalogos->formCatalogs());
@@ -222,8 +223,7 @@ final class ColaboradorController
             flash('success', 'Baja registrada correctamente.');
             redirect_to('colaboradores.show', ['id' => $id]);
         } catch (Throwable $exception) {
-            log_exception($exception);
-            FormState::flash($_POST, [$exception->getMessage() . ' — revisa almacenamiento/logs/app.log']);
+            FormState::flash($_POST, [safe_error_message($exception, 'No fue posible registrar la baja.', ['module' => 'colaboradores', 'action' => 'termination'])]);
             redirect_to('colaboradores.bajaForm', ['id' => $id]);
         }
     }
@@ -232,11 +232,12 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'eliminar');
         try {
+            require_post();
             verify_csrf();
             $this->colaboradores->delete(Sanitizer::int($_GET['id'] ?? 0));
             flash('success', 'Colaborador eliminado correctamente.');
         } catch (Throwable $exception) {
-            flash('error', $exception->getMessage());
+            flash('error', safe_error_message($exception, 'No fue posible eliminar el colaborador.', ['module' => 'colaboradores', 'action' => 'delete']));
         }
 
         redirect_to('colaboradores.index');
@@ -246,6 +247,7 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'editar');
         try {
+            require_post();
             verify_csrf();
             $data = [
                 'colaborador_id' => Sanitizer::int($_GET['id'] ?? 0),
@@ -261,7 +263,7 @@ final class ColaboradorController
             $this->historial->create($data);
             flash('success', 'Historial academico agregado.');
         } catch (Throwable $exception) {
-            flash('error', $exception->getMessage());
+            flash('error', safe_error_message($exception, 'No fue posible guardar el historial academico.', ['module' => 'historial', 'action' => 'create']));
         }
         redirect_to('colaboradores.show', ['id' => Sanitizer::int($_GET['id'] ?? 0)]);
     }
@@ -270,12 +272,13 @@ final class ColaboradorController
     {
         AuthService::ensure('colaboradores', 'editar');
         try {
+            require_post();
             verify_csrf();
             $id = Sanitizer::int($_GET['id'] ?? 0);
             $this->historial->delete($id);
             flash('success', 'Registro eliminado.');
         } catch (Throwable $exception) {
-            flash('error', $exception->getMessage());
+            flash('error', safe_error_message($exception, 'No fue posible eliminar el registro academico.', ['module' => 'historial', 'action' => 'delete']));
         }
         redirect_to('colaboradores.show', ['id' => Sanitizer::int($_GET['colaborador_id'] ?? 0)]);
     }

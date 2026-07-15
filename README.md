@@ -33,6 +33,8 @@ Aplicacion web completa para gestion de Capital Humano con autenticacion, contro
 - Programacion orientada a objetos.
 - Arquitectura MVC sencilla.
 - OpenSSL para firma y verificacion de datos sensibles.
+- Fileinfo para verificar el contenido real de archivos subidos.
+- ImageMagick recomendado para generar miniaturas normalizadas de fotografías.
 - PhpSpreadsheet para exportar reportes `.xlsx`.
 - HTML5, CSS3 y JavaScript basico.
 
@@ -67,7 +69,23 @@ DB_PASSWORD=
 database/capital_humano.sql
 ```
 
-4. Abrir:
+Si se actualiza una instalación anterior, ejecutar una sola vez:
+
+```text
+database/migrations/20260714_completar_vacaciones.sql
+```
+
+4. Generar una credencial exclusiva para la API de Contraloría y guardarla en `.env`:
+
+```bash
+php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+```
+
+```env
+CONTRALORIA_API_TOKEN=valor_generado
+```
+
+5. Abrir:
 
 ```text
 http://localhost/Software7/Proyectos/Software7-ProyectoFinal_Version_2/publico/index.php
@@ -109,6 +127,17 @@ Tablas incluidas:
 - La arquitectura sigue una separación clara entre controladores, modelos, servicios y vistas, lo que evita duplicación de lógica y facilita el mantenimiento, la escalabilidad y la revisión de seguridad.
 - Además, las entradas del usuario se validan y sanitizan antes de procesarse, reduciendo el riesgo de inyecciones y errores de manipulación de datos.
 - En la arquitectura, esta regla se refleja en `app/utilidades/Sanitizer.php`, `app/utilidades/Validator.php`, `app/controladores` y las vistas de `app/vistas`.
+- Las cargas usan Fileinfo, extensiones generadas por el servidor, límites de dimensiones y miniaturas sin confiar en el MIME o nombre enviados por el navegador.
+
+### Contrato criptográfico
+- `CryptographicServiceInterface` define las operaciones comunes `protect`, `verify` y `algorithm`.
+- `PasswordHashService` implementa el contrato para contraseñas y `RsaSignatureService` para firmas RSA-SHA256.
+- `IntegrityService` consume la abstracción y no depende directamente de las funciones OpenSSL.
+
+### Registro de errores
+- `FileLogger` guarda errores diarios en `almacenamiento/logs/errors-AAAA-MM-DD.log`.
+- Cada evento recibe un identificador de incidente y elimina contraseñas, tokens y otros secretos del contexto.
+- Los errores fatales y las excepciones web no controladas también se registran sin mostrar trazas al usuario.
 
 ### Sello de Integridad
 - El backend genera una firma digital OpenSSL cada vez que se guarda un registro crítico, usando información del dato y un par de claves para producir un sello único e inalterable.
@@ -142,14 +171,22 @@ Tablas incluidas:
 - Reporte visual con indicador de integridad OpenSSL (verde/rojo).
 - Busqueda por documento, nombre, correo, direccion u ocupacion.
 - Filtros por sexo y rango de edad.
+- Filtros por salario mínimo, salario máximo y dirección.
 - Paginacion en el reporte.
 - Estadisticas por sexo y rangos de edad.
+- Estadísticas agrupadas por dirección.
 - Exportacion a Excel `.xlsx` respetando los filtros activos.
 
 ### Vacaciones
 - Solicitudes de vacaciones con fechas de salida y retorno.
-- Calculo automatico de dias generados (1 mes por cada 11 meses trabajados).
+- Cálculo proporcional desde la primera contratación a razón de 1 día por cada 11 días trabajados.
+- Control de saldo, solicitudes solapadas y mínimo de 7 días calendario.
 - Aprobacion o rechazo de solicitudes.
+- Generación del resuelto aprobado en formato PDF.
+
+### Página pública
+- Portada pública con beneficios, valor estratégico, módulos, tecnologías y controles de seguridad.
+- El acceso inicial no requiere autenticación; los datos operativos continúan protegidos por roles.
 
 ### API REST
 - Endpoint para la Contraloria General con cantidad de colaboradores por sexo.
@@ -213,11 +250,20 @@ Software7-ProyectoFinal_Version_2/
 
 ## API REST
 
-Endpoint publico (requiere permiso `api.consultar`):
+Endpoint exclusivo para la Contraloría General mediante token Bearer:
 
 ```text
 GET publico/index.php?route=api.colaboradores.sexo
 ```
+
+Ejemplo:
+
+```bash
+curl -H "Authorization: Bearer VALOR_CONFIGURADO" \
+  "http://localhost/Software7/Proyectos/Software7-ProyectoFinal_Version_2/publico/index.php?route=api.colaboradores.sexo"
+```
+
+Sin token responde `401` en JSON; si la integración no está configurada responde `503`. La API no acepta la sesión administrativa como sustituto de la credencial de Contraloría.
 
 Respuesta de ejemplo:
 
@@ -248,5 +294,4 @@ El archivo SQL se guarda en `almacenamiento/exports/` con fecha y hora.
 - `docs/uml.md` — diagramas UML (actores, casos de uso, clases, estados, secuencia y DER).
 - `docs/diccionario_datos.md` — descripcion de tablas y columnas.
 - `docs/manual_usuario.md` — manual con capturas de pantalla (guardar imagenes en `docs/capturas/`).
-
 

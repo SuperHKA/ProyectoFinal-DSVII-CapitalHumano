@@ -7,10 +7,14 @@ use App\Controladores\AuthController;
 use App\Controladores\ColaboradorController;
 use App\Controladores\ReporteController;
 use App\Controladores\RolController;
+use App\Controladores\PublicController;
 use App\Controladores\UsuarioController;
 use App\Controladores\VacacionController;
 
 return [
+    // Sitio publico
+    'public.home' => [PublicController::class, 'home'],
+
     // Autenticación
     'login' => [AuthController::class, 'loginForm'],
     'login.process' => [AuthController::class, 'login'],
@@ -59,6 +63,7 @@ return [
     'vacaciones.store' => [VacacionController::class, 'store'],
     'vacaciones.aprobar' => [VacacionController::class, 'aprobar'],
     'vacaciones.rechazar' => [VacacionController::class, 'rechazar'],
+    'vacaciones.resuelto' => [VacacionController::class, 'resuelto'],
 
     // API REST
     'api.colaboradores.sexo' => [ApiController::class, 'porSexo'],

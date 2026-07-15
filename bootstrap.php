@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Utilidades\Sanitizer;
+use App\Servicios\FileLogger;
 
 define('ROOT_PATH', __DIR__);
 define('PUBLIC_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'publico');
@@ -35,28 +36,23 @@ function env_value(string $key, mixed $default = null): mixed
 }
 
 /**
- * Registra una excepcion en almacenamiento/logs/app.log para depuracion.
+ * Registra una excepcion en almacenamiento/logs con un identificador unico.
+ *
+ * @param array<string,mixed> $context
  */
-function log_exception(Throwable $exception): void
+function log_exception(Throwable $exception, array $context = []): string
 {
-    $logDir = ROOT_PATH . DIRECTORY_SEPARATOR . 'almacenamiento' . DIRECTORY_SEPARATOR . 'logs';
-    if (!is_dir($logDir) && !mkdir($logDir, 0755, true) && !is_dir($logDir)) {
-        return;
-    }
+    return (new FileLogger())->error($exception, $context);
+}
 
-    $entry = sprintf(
-        "[%s] %s in %s:%d
-%s
-
-",
-        date('Y-m-d H:i:s'),
-        $exception->getMessage(),
-        $exception->getFile(),
-        $exception->getLine(),
-        $exception->getTraceAsString()
-    );
-
-    error_log($entry, 3, $logDir . DIRECTORY_SEPARATOR . 'app.log');
+/**
+ * Registra el detalle y devuelve un mensaje seguro para el usuario.
+ *
+ * @param array<string,mixed> $context
+ */
+function safe_error_message(Throwable $exception, string $message = 'No fue posible completar la operacion.', array $context = []): string
+{
+    return $message . ' Referencia: ' . log_exception($exception, $context) . '.';
 }
 
 /**
@@ -146,9 +142,45 @@ function verify_csrf(): void
 }
 
 /**
+ * Restringe acciones mutables al metodo POST.
+ */
+function require_post(): void
+{
+    if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
+        http_response_code(405);
+        throw new RuntimeException('Metodo HTTP no permitido.');
+    }
+}
+
+/**
  * Marca una opcion select como elegida.
  */
 function selected(mixed $current, mixed $expected): string
 {
     return (string) $current === (string) $expected ? 'selected' : '';
 }
+
+set_error_handler(static function (int $severity, string $message, string $file, int $line): bool {
+    if ((error_reporting() & $severity) === 0) {
+        return false;
+    }
+    (new FileLogger())->error($message, [
+        'severity' => $severity,
+        'source_file' => $file,
+        'source_line' => $line,
+    ]);
+    return true;
+});
+
+register_shutdown_function(static function (): void {
+    $error = error_get_last();
+    if ($error === null || !in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        return;
+    }
+    (new FileLogger())->error((string) $error['message'], [
+        'severity' => $error['type'],
+        'source_file' => $error['file'],
+        'source_line' => $error['line'],
+        'fatal' => true,
+    ]);
+});

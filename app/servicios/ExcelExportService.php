@@ -51,17 +51,17 @@ final class ExcelExportService
         foreach ($rows as $row) {
             $sheet->fromArray([
                 $row['codigo_empleado'],
-                $row['identidad'],
-                $row['nombre_completo'],
+                $this->safeText($row['identidad']),
+                $this->safeText($row['nombre_completo']),
                 $row['edad'] ?? 'N/A',
                 $row['sexo'],
-                $row['direccion'] ?? '',
-                $row['correo'],
-                $row['celular'],
-                $row['ocupacion'],
-                $row['tipo_empleado'],
-                $row['planilla'],
-                $row['departamento'] ?? '',
+                $this->safeText($row['direccion'] ?? ''),
+                $this->safeText($row['correo']),
+                $this->safeText($row['celular']),
+                $this->safeText($row['ocupacion']),
+                $this->safeText($row['tipo_empleado']),
+                $this->safeText($row['planilla']),
+                $this->safeText($row['departamento'] ?? ''),
                 (float) $row['salario'],
                 $row['fecha_inicio'],
                 $row['fecha_fin'] ?? 'N/A',
@@ -89,5 +89,11 @@ final class ExcelExportService
         header('Cache-Control: max-age=0');
         (new Xlsx($spreadsheet))->save('php://output');
         exit;
+    }
+
+    private function safeText(mixed $value): string
+    {
+        $text = (string) $value;
+        return preg_match('/^[=+\-@]/', $text) === 1 ? "'" . $text : $text;
     }
 }

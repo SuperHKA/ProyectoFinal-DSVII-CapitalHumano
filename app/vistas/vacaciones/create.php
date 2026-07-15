@@ -1,6 +1,6 @@
 <section class="section-head">
     <h1>Nueva solicitud de vacaciones</h1>
-    <p>El sistema calcula los dias generados automaticamente.</p>
+    <p>El sistema calcula el saldo desde la primera contratación. La solicitud mínima es de 7 días calendario.</p>
 </section>
 
 <?php if (!empty($errors)): ?>
@@ -15,7 +15,7 @@
         <select name="colaborador_id" required>
             <option value="">Seleccione</option>
             <?php foreach ($colaboradores as $c): ?>
-                <option value="<?= e($c['id']) ?>" <?= selected($old['colaborador_id'] ?? '', $c['id']) ?>><?= e($c['nombre_completo']) ?></option>
+                <option value="<?= e($c['id']) ?>" <?= selected($old['colaborador_id'] ?? '', $c['id']) ?>><?= e($c['nombre_completo']) ?> — <?= e(number_format((float) $c['saldo']['disponibles'], 2)) ?> días disponibles</option>
             <?php endforeach; ?>
         </select>
     </label>

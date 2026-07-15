@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Servicios;
 
 use App\Contratos\ErrorHandlerInterface;
+use App\Contratos\LoggerInterface;
 use Throwable;
 
 /**
@@ -12,9 +13,14 @@ use Throwable;
  */
 final class WebErrorHandler implements ErrorHandlerInterface
 {
+    public function __construct(private ?LoggerInterface $logger = null)
+    {
+        $this->logger ??= new FileLogger();
+    }
+
     public function handle(Throwable $exception): void
     {
-        log_exception($exception);
-        flash('error', $exception->getMessage() . ' — revisa almacenamiento/logs/app.log');
+        $incidentId = $this->logger->error($exception);
+        flash('error', 'Ocurrio un error inesperado. Referencia: ' . $incidentId . '.');
     }
 }

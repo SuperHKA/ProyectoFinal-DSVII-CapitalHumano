@@ -28,7 +28,7 @@ final class Colaborador
      */
     public function all(?string $search = null): array
     {
-        [$where, $params] = $this->buildFilterSql($search, null, null);
+        [$where, $params] = $this->buildFilterSql($search, null, null, null, null, null);
         $statement = $this->db->prepare($this->baseSelect() . ' ' . $where . ' ORDER BY c.fecha_registro DESC, c.id DESC');
         $statement->execute($params);
 
@@ -38,9 +38,18 @@ final class Colaborador
     /**
      * @return array<string,mixed>
      */
-    public function paginated(?string $search = null, int $page = 1, int $perPage = 15, ?string $sexo = null, ?string $rangoEdad = null): array
+    public function paginated(
+        ?string $search = null,
+        int $page = 1,
+        int $perPage = 15,
+        ?string $sexo = null,
+        ?string $rangoEdad = null,
+        ?float $salarioMin = null,
+        ?float $salarioMax = null,
+        ?string $direccion = null
+    ): array
     {
-        [$where, $params] = $this->buildFilterSql($search, $sexo, $rangoEdad);
+        [$where, $params] = $this->buildFilterSql($search, $sexo, $rangoEdad, $salarioMin, $salarioMax, $direccion);
         $offset = ($page - 1) * $perPage;
 
         $selectSql = preg_replace('/^SELECT/', 'SELECT SQL_CALC_FOUND_ROWS', $this->baseSelect(), 1);
@@ -250,9 +259,16 @@ final class Colaborador
     /**
      * @return array<int,array<string,mixed>>
      */
-    public function report(?string $search = null, ?string $sexo = null, ?string $rangoEdad = null): array
+    public function report(
+        ?string $search = null,
+        ?string $sexo = null,
+        ?string $rangoEdad = null,
+        ?float $salarioMin = null,
+        ?float $salarioMax = null,
+        ?string $direccion = null
+    ): array
     {
-        [$where, $params] = $this->buildFilterSql($search, $sexo, $rangoEdad);
+        [$where, $params] = $this->buildFilterSql($search, $sexo, $rangoEdad, $salarioMin, $salarioMax, $direccion);
         $statement = $this->db->prepare($this->baseSelect() . ' ' . $where . ' ORDER BY c.fecha_registro DESC, c.id DESC');
         $statement->execute($params);
         $rows = $statement->fetchAll();
@@ -271,7 +287,14 @@ final class Colaborador
     /**
      * @return array{0: string, 1: array<string,mixed>}
      */
-    private function buildFilterSql(?string $search, ?string $sexo, ?string $rangoEdad): array
+    private function buildFilterSql(
+        ?string $search,
+        ?string $sexo,
+        ?string $rangoEdad,
+        ?float $salarioMin,
+        ?float $salarioMax,
+        ?string $direccion
+    ): array
     {
         $conditions = [];
         $params = [];
@@ -308,6 +331,19 @@ final class Colaborador
             };
         }
 
+        if ($salarioMin !== null) {
+            $conditions[] = 'pl.salario >= :salario_min';
+            $params['salario_min'] = number_format($salarioMin, 2, '.', '');
+        }
+        if ($salarioMax !== null) {
+            $conditions[] = 'pl.salario <= :salario_max';
+            $params['salario_max'] = number_format($salarioMax, 2, '.', '');
+        }
+        if ($direccion !== null && trim($direccion) !== '') {
+            $conditions[] = 'c.direccion LIKE :direccion';
+            $params['direccion'] = '%' . trim($direccion) . '%';
+        }
+
         $where = $conditions ? 'WHERE ' . implode(' AND ', $conditions) : '';
 
         return [$where, $params];
@@ -336,6 +372,20 @@ final class Colaborador
             FROM colaboradores
             GROUP BY rango
             ORDER BY rango"
+        )->fetchAll();
+    }
+
+    /**
+     * @return array<int,array{direccion:string,total:int|string}>
+     */
+    public function estadisticasPorDireccion(): array
+    {
+        return $this->db->query(
+            "SELECT COALESCE(NULLIF(TRIM(direccion), ''), 'Sin direccion') AS direccion, COUNT(*) AS total
+             FROM colaboradores
+             GROUP BY COALESCE(NULLIF(TRIM(direccion), ''), 'Sin direccion')
+             ORDER BY total DESC, direccion ASC
+             LIMIT 10"
         )->fetchAll();
     }
 

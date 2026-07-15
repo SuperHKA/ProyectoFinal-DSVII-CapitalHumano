@@ -45,7 +45,7 @@ final class AuthService
             }
         }
 
-        if (!password_verify($password, (string) $row['password_hash'])) {
+        if (!$this->usuarios->verifyPassword($password, (string) $row['password_hash'])) {
             $this->usuarios->incrementFailedAttempts($id);
             $attempts = (int) $row['intentos_fallidos'] + 1;
             $anomalia = $attempts >= self::MAX_ATTEMPTS;
@@ -59,6 +59,7 @@ final class AuthService
         $this->usuarios->resetAttempts($id);
         $this->usuarios->logAccess($id, $usuario, 'exitoso', false);
 
+        session_regenerate_id(true);
         $_SESSION['usuario_id'] = $id;
         $_SESSION['usuario'] = $row['usuario'];
         $_SESSION['usuario_nombre'] = $row['nombre'];
@@ -68,6 +69,7 @@ final class AuthService
     public function logout(): void
     {
         unset($_SESSION['usuario_id'], $_SESSION['usuario'], $_SESSION['usuario_nombre'], $_SESSION['permisos']);
+        session_regenerate_id(true);
     }
 
     public static function check(): bool

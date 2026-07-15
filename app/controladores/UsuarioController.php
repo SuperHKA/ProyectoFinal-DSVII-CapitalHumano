@@ -50,6 +50,7 @@ final class UsuarioController
     {
         AuthService::ensure('usuarios', 'crear');
         try {
+            require_post();
             verify_csrf();
             $data = Sanitizer::usuario($_POST);
             $errors = Validator::usuario($data, true);
@@ -62,7 +63,7 @@ final class UsuarioController
             flash('success', 'Usuario creado correctamente.');
             redirect_to('usuarios.index');
         } catch (Throwable $exception) {
-            FormState::flash($_POST, [$exception->getMessage()]);
+            FormState::flash($_POST, [safe_error_message($exception, 'No fue posible crear el usuario.', ['module' => 'usuarios', 'action' => 'create'])]);
             redirect_to('usuarios.create');
         }
     }
@@ -91,6 +92,7 @@ final class UsuarioController
         AuthService::ensure('usuarios', 'editar');
         $id = Sanitizer::int($_GET['id'] ?? 0);
         try {
+            require_post();
             verify_csrf();
             $data = Sanitizer::usuario($_POST);
             $errors = Validator::usuario($data, false);
@@ -103,7 +105,7 @@ final class UsuarioController
             flash('success', 'Usuario actualizado correctamente.');
             redirect_to('usuarios.index');
         } catch (Throwable $exception) {
-            FormState::flash($_POST, [$exception->getMessage()]);
+            FormState::flash($_POST, [safe_error_message($exception, 'No fue posible actualizar el usuario.', ['module' => 'usuarios', 'action' => 'update'])]);
             redirect_to('usuarios.edit', ['id' => $id]);
         }
     }
@@ -112,12 +114,13 @@ final class UsuarioController
     {
         AuthService::ensure('usuarios', 'editar');
         try {
+            require_post();
             verify_csrf();
             $id = Sanitizer::int($_GET['id'] ?? 0);
             $this->usuarios->toggleActive($id);
             flash('success', 'Estado del usuario actualizado.');
         } catch (Throwable $exception) {
-            flash('error', $exception->getMessage());
+            flash('error', safe_error_message($exception, 'No fue posible cambiar el estado del usuario.', ['module' => 'usuarios', 'action' => 'toggle']));
         }
         redirect_to('usuarios.index');
     }

@@ -878,10 +878,16 @@ CREATE TABLE solicitudes_vacaciones (
     fecha_fin DATE NOT NULL,
     dias_solicitados INT NOT NULL,
     dias_generados DECIMAL(8,2) NOT NULL,
+    saldo_antes DECIMAL(8,2) NOT NULL DEFAULT 0,
     estado ENUM('Pendiente','Aprobada','Rechazada') NOT NULL DEFAULT 'Pendiente',
     observaciones TEXT NULL,
+    numero_resuelto VARCHAR(30) NULL,
+    fecha_resuelto DATETIME NULL,
+    aprobado_por INT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     KEY idx_vacaciones_colaborador (colaborador_id),
+    KEY idx_vacaciones_aprobador (aprobado_por),
+    UNIQUE KEY uq_vacaciones_resuelto (numero_resuelto),
     CONSTRAINT fk_vacaciones_colaborador FOREIGN KEY (colaborador_id) REFERENCES colaboradores(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT chk_vacaciones_fechas CHECK (fecha_fin >= fecha_inicio)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -964,6 +970,9 @@ ALTER TABLE perfiles_laborales
     ADD CONSTRAINT fk_perfiles_departamento FOREIGN KEY (departamento_id) REFERENCES departamentos(id) ON DELETE RESTRICT ON UPDATE CASCADE,
     ADD CONSTRAINT fk_perfiles_motivo FOREIGN KEY (motivo_terminacion_id) REFERENCES cat_motivos_terminacion(C_TERMINACION) ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE solicitudes_vacaciones
+    ADD CONSTRAINT fk_vacaciones_aprobador FOREIGN KEY (aprobado_por) REFERENCES usuarios(id) ON DELETE SET NULL ON UPDATE CASCADE;
+
 -- ============================================================
 -- Datos semilla de seguridad
 -- ============================================================
@@ -989,8 +998,7 @@ INSERT INTO permisos (modulo, accion, descripcion) VALUES
 ('roles', 'crear', 'Crear roles'),
 ('roles', 'editar', 'Editar roles'),
 ('vacaciones', 'ver', 'Ver vacaciones'),
-('vacaciones', 'crear', 'Crear solicitudes de vacaciones'),
-('api', 'consultar', 'Consultar API REST');
+('vacaciones', 'crear', 'Crear solicitudes de vacaciones');
 
 INSERT INTO rol_permiso (rol_id, permiso_id) SELECT 1, id FROM permisos;
 INSERT INTO rol_permiso (rol_id, permiso_id) SELECT 2, id FROM permisos WHERE modulo IN ('colaboradores', 'reportes', 'vacaciones');

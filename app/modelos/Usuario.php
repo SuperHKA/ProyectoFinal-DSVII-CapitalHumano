@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modelos;
 
+use App\Contratos\CryptographicServiceInterface;
+use App\Servicios\PasswordHashService;
 use Config\Database;
 use PDO;
 
@@ -13,10 +15,12 @@ use PDO;
 final class Usuario
 {
     private PDO $db;
+    private CryptographicServiceInterface $passwords;
 
-    public function __construct(?PDO $db = null)
+    public function __construct(?PDO $db = null, ?CryptographicServiceInterface $passwords = null)
     {
         $this->db = $db ?? Database::getConnection();
+        $this->passwords = $passwords ?? new PasswordHashService();
     }
 
     /**
@@ -76,7 +80,7 @@ final class Usuario
                 'nombre' => $data['nombre'],
                 'correo' => $data['correo'],
                 'usuario' => $data['usuario'],
-                'password_hash' => password_hash($data['password'], PASSWORD_DEFAULT),
+                'password_hash' => $this->passwords->protect((string) $data['password']),
                 'activo' => $data['activo'] ? 1 : 0,
             ]);
             $id = (int) $this->db->lastInsertId();
@@ -107,7 +111,7 @@ final class Usuario
             ];
             if (!empty($data['password'])) {
                 $sql .= ', password_hash = :password_hash';
-                $params['password_hash'] = password_hash($data['password'], PASSWORD_DEFAULT);
+                $params['password_hash'] = $this->passwords->protect((string) $data['password']);
             }
             $sql .= ' WHERE id = :id';
 
@@ -161,6 +165,11 @@ final class Usuario
             'UPDATE usuarios SET intentos_fallidos = intentos_fallidos + 1 WHERE id = :id'
         );
         $statement->execute(['id' => $id]);
+    }
+
+    public function verifyPassword(string $plainText, string $hash): bool
+    {
+        return $this->passwords->verify($plainText, $hash);
     }
 
     public function block(int $id, int $minutes = 30): void

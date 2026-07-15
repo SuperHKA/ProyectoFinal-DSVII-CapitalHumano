@@ -4,7 +4,7 @@
         <p>Perfiles laborales e integridad OpenSSL.</p>
     </div>
     <?php if (\App\Servicios\AuthService::can('reportes', 'exportar')): ?>
-        <a class="btn primary" href="<?= e(url('reportes.export', ['q' => $q, 'sexo' => $sexo, 'edad' => $edad])) ?>">Exportar Excel</a>
+        <a class="btn primary" href="<?= e(url('reportes.export', ['q' => $q, 'sexo' => $sexo, 'edad' => $edad, 'direccion' => $direccion, 'salario_min' => $salario_min, 'salario_max' => $salario_max])) ?>">Exportar Excel</a>
     <?php endif; ?>
 </section>
 
@@ -23,6 +23,9 @@
             <option value="<?= e($r) ?>" <?= selected($edad, $r) ?>><?= e($r) ?></option>
         <?php endforeach; ?>
     </select>
+    <input name="direccion" placeholder="Dirección o sector" value="<?= e($direccion) ?>">
+    <input type="number" name="salario_min" min="0" step="0.01" placeholder="Salario mínimo" value="<?= e($salario_min ?? '') ?>">
+    <input type="number" name="salario_max" min="0" step="0.01" placeholder="Salario máximo" value="<?= e($salario_max ?? '') ?>">
     <button class="btn" type="submit">Buscar</button>
     <a class="btn ghost" href="<?= e(url('reportes.index')) ?>">Limpiar</a>
 </form>
@@ -34,6 +37,12 @@
             <strong>Por sexo</strong>
             <?php foreach ($por_sexo as $s): ?>
                 <div><?= e($s['sexo']) ?>: <?= e($s['total']) ?></div>
+            <?php endforeach; ?>
+        </div>
+        <div class="stat-card">
+            <strong>Por dirección</strong>
+            <?php foreach ($por_direccion as $d): ?>
+                <div><?= e($d['direccion']) ?>: <?= e($d['total']) ?></div>
             <?php endforeach; ?>
         </div>
         <div class="stat-card">
@@ -76,7 +85,9 @@
             <tr>
                 <td>
                     <?php if (!empty($row['fotografia'])): ?>
-                        <img src="<?= e($row['fotografia']) ?>" alt="Foto" class="report-thumb">
+                        <a href="<?= e($row['fotografia']) ?>" target="_blank" rel="noopener" title="Abrir fotografía original">
+                            <img src="<?= e(\App\Servicios\FileUploadService::thumbnailPath($row['fotografia'])) ?>" alt="Foto de <?= e($row['nombre_completo']) ?>" class="report-thumb">
+                        </a>
                     <?php else: ?>
                         <span class="muted">Sin foto</span>
                     <?php endif; ?>
@@ -118,9 +129,8 @@
         <?php if ($i === $paginacion['page']): ?>
             <span class="btn small active"><?= e($i) ?></span>
         <?php else: ?>
-            <a class="btn small" href="<?= e(url('reportes.index', ['q' => $q, 'sexo' => $sexo, 'edad' => $edad, 'page' => $i])) ?>"><?= e($i) ?></a>
+            <a class="btn small" href="<?= e(url('reportes.index', ['q' => $q, 'sexo' => $sexo, 'edad' => $edad, 'direccion' => $direccion, 'salario_min' => $salario_min, 'salario_max' => $salario_max, 'page' => $i])) ?>"><?= e($i) ?></a>
         <?php endif; ?>
     <?php endfor; ?>
 </div>
 <?php endif; ?>
-

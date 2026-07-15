@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Servicios;
 
+use App\Contratos\CryptographicServiceInterface;
 use RuntimeException;
+use Throwable;
 
 /**
- * Firma y verifica datos sensibles de perfiles laborales con OpenSSL.
+ * Canoniza perfiles laborales y delega la criptografia al contrato comun.
  */
 final class IntegrityService
 {
-    private string $privateKeyPath;
-    private string $publicKeyPath;
+    private CryptographicServiceInterface $signer;
 
-    public function __construct()
+    public function __construct(?CryptographicServiceInterface $signer = null)
     {
-        $this->privateKeyPath = ROOT_PATH . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'keys' . DIRECTORY_SEPARATOR . 'private.pem';
-        $this->publicKeyPath = ROOT_PATH . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'keys' . DIRECTORY_SEPARATOR . 'public.pem';
+        $this->signer = $signer ?? new RsaSignatureService();
     }
 
     /**
@@ -49,74 +49,28 @@ final class IntegrityService
      */
     public function signPerfilLaboral(array $data): string
     {
-        return $this->signPayload($this->canonicalPerfilLaboral($data), 'No fue posible firmar el perfil laboral.');
-    }
-
-    private function signPayload(string $payload, string $errorMessage): string
-    {
-        $key = $this->loadPrivateKey();
-        $signature = '';
-        if (!openssl_sign($payload, $signature, $key, OPENSSL_ALGO_SHA256)) {
-            throw new RuntimeException($errorMessage);
-        }
-
-        return base64_encode($signature);
+        return $this->signer->protect($this->canonicalPerfilLaboral($data));
     }
 
     /**
      * @param array<string,mixed> $data
      * @return array{valid:bool,message:string}
      */
-    public function verifyPerfilLaboral(array $data, ?string $signatureBase64): array
+    public function verifyPerfilLaboral(array $data, ?string $signature): array
     {
-        return $this->verifyPayload($this->canonicalPerfilLaboral($data), $signatureBase64);
-    }
-
-    /**
-     * @return array{valid:bool,message:string}
-     */
-    private function verifyPayload(string $payload, ?string $signatureBase64): array
-    {
-        if ($signatureBase64 === null || trim($signatureBase64) === '') {
+        if ($signature === null || trim($signature) === '') {
             return ['valid' => false, 'message' => 'Firma ausente'];
         }
 
-        $signature = base64_decode($signatureBase64, true);
-        if ($signature === false) {
-            return ['valid' => false, 'message' => 'Firma ilegible'];
+        try {
+            $valid = $this->signer->verify($this->canonicalPerfilLaboral($data), $signature);
+            return [
+                'valid' => $valid,
+                'message' => $valid ? 'Integridad completa' : 'Registro vulnerado',
+            ];
+        } catch (Throwable $exception) {
+            log_exception($exception, ['service' => self::class, 'operation' => 'verify']);
+            return ['valid' => false, 'message' => 'Error al verificar firma'];
         }
-
-        if (!is_file($this->publicKeyPath)) {
-            return ['valid' => false, 'message' => 'Clave publica no encontrada'];
-        }
-
-        $key = openssl_pkey_get_public((string) file_get_contents($this->publicKeyPath));
-        if ($key === false) {
-            return ['valid' => false, 'message' => 'Clave publica invalida'];
-        }
-
-        $result = openssl_verify($payload, $signature, $key, OPENSSL_ALGO_SHA256);
-        if ($result === 1) {
-            return ['valid' => true, 'message' => 'Integridad completa'];
-        }
-
-        return ['valid' => false, 'message' => $result === 0 ? 'Registro vulnerado' : 'Error OpenSSL'];
-    }
-
-    /**
-     * @return resource
-     */
-    private function loadPrivateKey()
-    {
-        if (!is_file($this->privateKeyPath)) {
-            throw new RuntimeException('No existe config/keys/private.pem. Genere las llaves OpenSSL antes de guardar.');
-        }
-
-        $key = openssl_pkey_get_private((string) file_get_contents($this->privateKeyPath));
-        if ($key === false) {
-            throw new RuntimeException('La clave privada no pudo cargarse.');
-        }
-
-        return $key;
     }
 }
