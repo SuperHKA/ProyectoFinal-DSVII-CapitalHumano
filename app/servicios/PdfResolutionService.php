@@ -18,17 +18,17 @@ final class PdfResolutionService
             'SISTEMA DE CAPITAL HUMANO',
             'RESUELTO DE VACACIONES',
             '',
-            'Numero: ' . ($resolution['numero_resuelto'] ?? ''),
-            'Fecha de emision: ' . ($resolution['fecha_resuelto'] ?? date('Y-m-d H:i:s')),
+            'Número: ' . ($resolution['numero_resuelto'] ?? ''),
+            'Fecha de emisión: ' . ($resolution['fecha_resuelto'] ?? date('Y-m-d H:i:s')),
             '',
-            'Se resuelve aprobar el periodo de vacaciones de:',
+            'Se resuelve aprobar el período de vacaciones de:',
             (string) ($resolution['colaborador'] ?? ''),
-            'Identificacion: ' . ($resolution['identidad'] ?? ''),
+            'Identificación: ' . ($resolution['identidad'] ?? ''),
             'Departamento: ' . ($resolution['departamento'] ?? 'No asignado'),
             '',
-            'Periodo autorizado: ' . ($resolution['fecha_inicio'] ?? '') . ' al ' . ($resolution['fecha_fin'] ?? ''),
-            'Dias autorizados: ' . ($resolution['dias_solicitados'] ?? 0),
-            'Dias generados a la solicitud: ' . ($resolution['dias_generados'] ?? 0),
+            'Período autorizado: ' . ($resolution['fecha_inicio'] ?? '') . ' al ' . ($resolution['fecha_fin'] ?? ''),
+            'Días autorizados: ' . ($resolution['dias_solicitados'] ?? 0),
+            'Días generados a la solicitud: ' . ($resolution['dias_generados'] ?? 0),
             'Saldo anterior: ' . ($resolution['saldo_antes'] ?? 0),
             'Saldo posterior estimado: ' . ($resolution['saldo_despues'] ?? 0),
             '',
@@ -36,10 +36,10 @@ final class PdfResolutionService
             '',
             'Aprobado por: ' . ($resolution['aprobado_por_nombre'] ?? 'Usuario autorizado'),
             '',
-            'Documento generado electronicamente por el Sistema de Capital Humano.',
+            'Documento generado electrónicamente por el Sistema de Capital Humano.',
         ];
 
-        $content = "BT\n/F1 11 Tf\n50 790 Td\n14 TL\n";
+        $content = "BT\n/F1 11 Tf\n50 750 Td\n14 TL\n";
         foreach ($lines as $index => $line) {
             if ($index > 0) {
                 $content .= "T*\n";
@@ -53,7 +53,7 @@ final class PdfResolutionService
             '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
             '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>',
             '<< /Length ' . strlen($content) . " >>\nstream\n" . $content . "\nendstream",
-            '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+            '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
         ];
 
         $pdf = "%PDF-1.4\n";
@@ -77,7 +77,7 @@ final class PdfResolutionService
 
     private function escape(mixed $value): string
     {
-        $latin = mb_convert_encoding((string) $value, 'ISO-8859-1', 'UTF-8');
-        return str_replace(['\\', '(', ')', "\r", "\n"], ['\\\\', '\\(', '\\)', '', ' '], $latin);
+        $winAnsi = mb_convert_encoding((string) $value, 'Windows-1252', 'UTF-8');
+        return str_replace(['\\', '(', ')', "\r", "\n"], ['\\\\', '\\(', '\\)', '', ' '], $winAnsi);
     }
 }

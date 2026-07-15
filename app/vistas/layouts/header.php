@@ -54,7 +54,7 @@
         <?php endif; ?>
     </div>
 </header>
-<?php $widePage = in_array($_GET['route'] ?? '', ['home', 'colaboradores.index', 'colaboradores.show'], true); ?>
+<?php $widePage = in_array($_GET['route'] ?? '', ['home', 'colaboradores.index', 'colaboradores.show', 'reportes.index'], true); ?>
 <main class="page<?= $widePage ? ' page-wide' : '' ?>">
     <?php if ($message = flash('success')): ?>
         <div class="alert alert-success"><?= e($message) ?></div>
