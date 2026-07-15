@@ -101,8 +101,8 @@
     <h2>Historial laboral</h2>
     <p>El cargo activo queda marcado en verde. Los registros finalizados quedan como historicos.</p>
 </section>
-<div class="table-wrap">
-    <table>
+<div class="table-wrap employment-history-table-wrap">
+    <table class="employment-history-table">
         <thead>
             <tr>
                 <th>Puesto</th>

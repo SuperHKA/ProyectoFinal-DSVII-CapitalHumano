@@ -130,6 +130,10 @@ img { max-width: 100%; display: block; }
   margin: 28px auto 52px;
 }
 
+.page.page-wide {
+  width: min(1600px, calc(100% - 40px));
+}
+
 /* ── Section Head ────────────────────────────────── */
 .section-head {
   margin-bottom: 22px;
@@ -551,6 +555,55 @@ table {
   width: 100%;
   min-width: 820px;
   border-collapse: collapse;
+}
+
+.collaborators-table {
+  min-width: 1100px;
+  table-layout: auto;
+}
+
+.collaborators-table tbody td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.collaborators-table th:nth-child(1),
+.collaborators-table td:nth-child(1),
+.collaborators-table th:nth-child(2),
+.collaborators-table td:nth-child(2),
+.collaborators-table th:nth-child(8),
+.collaborators-table td:nth-child(8),
+.collaborators-table th:nth-child(9),
+.collaborators-table td:nth-child(9) {
+  white-space: nowrap;
+}
+
+.collaborators-table th:last-child,
+.collaborators-table td:last-child {
+  min-width: 180px;
+}
+
+.collaborators-table .actions {
+  gap: 6px;
+}
+
+.employment-history-table {
+  min-width: 1050px;
+  table-layout: auto;
+}
+
+.employment-history-table th,
+.employment-history-table td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.employment-history-table td:nth-child(5),
+.employment-history-table td:nth-child(6),
+.employment-history-table td:nth-child(7),
+.employment-history-table td:nth-child(8),
+.employment-history-table td:nth-child(9) {
+  white-space: nowrap;
 }
 
 .report table, .report-table table { min-width: 1800px; }

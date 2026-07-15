@@ -12,8 +12,8 @@
     <input name="q" placeholder="Buscar por documento, nombre, correo, direccion u ocupacion" value="<?= e($q) ?>">
     <button class="btn" type="submit">Buscar</button>
 </form>
-<div class="table-wrap">
-    <table>
+<div class="table-wrap collaborators-table-wrap">
+    <table class="collaborators-table">
         <thead>
             <tr>
                 <th>Codigo</th>
@@ -44,26 +44,28 @@
                         <?= e($row['estado_colaborador'] ?? ((int) $row['empleado_activo'] === 1 ? 'Activo' : 'Inactivo')) ?>
                     </span>
                 </td>
-                <td class="actions">
-                    <a class="action-btn view" href="<?= e(url('colaboradores.show', ['id' => $row['id']])) ?>">Ver</a>
-                    <?php if (\App\Servicios\AuthService::can('colaboradores', 'editar')): ?>
-                        <a class="action-btn edit" href="<?= e(url('colaboradores.edit', ['id' => $row['id']])) ?>">Editar</a>
-                    <?php endif; ?>
-                    <?php if (\App\Servicios\AuthService::can('colaboradores', 'promover') && (int) $row['empleado_activo'] === 1): ?>
-                        <a class="action-btn promote" href="<?= e(url('colaboradores.promoteForm', ['id' => $row['id']])) ?>">Promocion</a>
-                    <?php endif; ?>
-                    <?php if (\App\Servicios\AuthService::can('colaboradores', 'baja') && (int) $row['empleado_activo'] === 1): ?>
-                        <a class="action-btn danger-soft" href="<?= e(url('colaboradores.bajaForm', ['id' => $row['id']])) ?>">Baja</a>
-                    <?php endif; ?>
-                    <?php if (\App\Servicios\AuthService::can('colaboradores', 'reincorporar') && (int) $row['empleado_activo'] === 0): ?>
-                        <a class="action-btn rehire" href="<?= e(url('colaboradores.reincorporateForm', ['id' => $row['id']])) ?>">Reincorporar</a>
-                    <?php endif; ?>
-                    <?php if (\App\Servicios\AuthService::can('colaboradores', 'eliminar')): ?>
-                        <form method="post" action="<?= e(url('colaboradores.destroy', ['id' => $row['id']])) ?>" class="inline" onsubmit="return confirm('¿Eliminar colaborador?')">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="action-btn danger">Eliminar</button>
-                        </form>
-                    <?php endif; ?>
+                <td>
+                    <div class="actions">
+                        <a class="action-btn view" href="<?= e(url('colaboradores.show', ['id' => $row['id']])) ?>">Ver</a>
+                        <?php if (\App\Servicios\AuthService::can('colaboradores', 'editar')): ?>
+                            <a class="action-btn edit" href="<?= e(url('colaboradores.edit', ['id' => $row['id']])) ?>">Editar</a>
+                        <?php endif; ?>
+                        <?php if (\App\Servicios\AuthService::can('colaboradores', 'promover') && (int) $row['empleado_activo'] === 1): ?>
+                            <a class="action-btn promote" href="<?= e(url('colaboradores.promoteForm', ['id' => $row['id']])) ?>">Promocion</a>
+                        <?php endif; ?>
+                        <?php if (\App\Servicios\AuthService::can('colaboradores', 'baja') && (int) $row['empleado_activo'] === 1): ?>
+                            <a class="action-btn danger-soft" href="<?= e(url('colaboradores.bajaForm', ['id' => $row['id']])) ?>">Baja</a>
+                        <?php endif; ?>
+                        <?php if (\App\Servicios\AuthService::can('colaboradores', 'reincorporar') && (int) $row['empleado_activo'] === 0): ?>
+                            <a class="action-btn rehire" href="<?= e(url('colaboradores.reincorporateForm', ['id' => $row['id']])) ?>">Reincorporar</a>
+                        <?php endif; ?>
+                        <?php if (\App\Servicios\AuthService::can('colaboradores', 'eliminar')): ?>
+                            <form method="post" action="<?= e(url('colaboradores.destroy', ['id' => $row['id']])) ?>" class="inline" onsubmit="return confirm('¿Eliminar colaborador?')">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="action-btn danger">Eliminar</button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
                 </td>
             </tr>
         <?php endforeach; ?>
